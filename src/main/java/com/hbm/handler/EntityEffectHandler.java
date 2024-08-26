@@ -8,11 +8,16 @@ import com.hbm.config.BombConfig;
 import com.hbm.config.GeneralConfig;
 import com.hbm.config.RadiationConfig;
 import com.hbm.config.WorldConfig;
+import com.hbm.dim.trait.CBT_Atmosphere;
+import com.hbm.entity.missile.EntityRideableRocket;
+import com.hbm.entity.mob.EntityCyberCrab;
+import com.hbm.entity.mob.glyphid.EntityGlyphid;
 import com.hbm.explosion.ExplosionNukeSmall;
 import com.hbm.extprop.HbmLivingProps;
 import com.hbm.extprop.HbmPlayerProps;
 import com.hbm.extprop.HbmLivingProps.ContaminationEffect;
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.handler.atmosphere.ChunkAtmosphereManager;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
 import com.hbm.handler.radiation.ChunkRadiationManager;
@@ -115,6 +120,11 @@ public class EntityEffectHandler {
 			if(radiation > 0) {
 				ContaminationUtil.contaminate(entity, HazardType.RADIATION, ContaminationType.CREATIVE, radiation / 20F);
 			}
+			
+			CBT_Atmosphere atmosphere = getAtmosphereCached(entity);
+
+			handleOxy(entity, atmosphere);
+			handleCorrosion(entity, atmosphere);
 		}
 
 		handleContamination(entity);
@@ -125,7 +135,6 @@ public class EntityEffectHandler {
 		handleOil(entity);
 		handlePollution(entity);
 		handleTemperature(entity);
-
 		handleDashing(entity);
 		handlePlinking(entity);
 		
@@ -174,6 +183,17 @@ public class EntityEffectHandler {
 			if(!player.worldObj.isRemote) ArmorUtil.resetFlightTime(player);
 		}
 	}
+
+	private static CBT_Atmosphere getAtmosphereCached(EntityLivingBase entity) {
+		// Update non-player entities once per second
+		if(entity instanceof EntityPlayerMP || entity.ticksExisted % 20 == 0) {
+			CBT_Atmosphere atmosphere = ChunkAtmosphereManager.proxy.getAtmosphere(entity);
+			HbmLivingProps.setAtmosphere(entity, atmosphere);
+			return atmosphere;
+		}
+
+		return HbmLivingProps.getAtmosphere(entity);
+	}
 	
 	private static void handleContamination(EntityLivingBase entity) {
 		
@@ -181,7 +201,7 @@ public class EntityEffectHandler {
 			return;
 		
 		List<ContaminationEffect> contamination = HbmLivingProps.getCont(entity);
-		List<ContaminationEffect> rem = new ArrayList();
+		List<ContaminationEffect> rem = new ArrayList<ContaminationEffect>();
 		
 		for(ContaminationEffect con : contamination) {
 			ContaminationUtil.contaminate(entity, HazardType.RADIATION, con.ignoreArmor ? ContaminationType.RAD_BYPASS : ContaminationType.CREATIVE, con.getRad());
@@ -210,6 +230,14 @@ public class EntityEffectHandler {
 	
 			float rad = ChunkRadiationManager.proxy.getRadiation(world, ix, iy, iz);
 	
+			float neut = HbmLivingProps.getNeutronActivation(entity);
+			
+			if(neut > 0 && !RadiationConfig.disableNeutron) {
+				ContaminationUtil.contaminate(entity, HazardType.RADIATION, ContaminationType.RAD_BYPASS, neut / 20F);
+				HbmLivingProps.setNeutronActivation(entity,neut*0.998816f);//20 minute half life
+			}
+			if(neut<1e-5)
+				HbmLivingProps.setNeutronActivation(entity,0);
 			if(world.provider.isHellWorld && RadiationConfig.hellRad > 0 && rad < RadiationConfig.hellRad)
 				rad = (float) RadiationConfig.hellRad;
 	
@@ -283,7 +311,34 @@ public class EntityEffectHandler {
 			}
 		}
 	}
-	
+
+	private static void handleOxy(EntityLivingBase entity, CBT_Atmosphere atmosphere) {
+		if(entity.worldObj.isRemote) return;
+		if(entity instanceof EntityGlyphid) return; // can't suffocate the bastards
+		if(entity instanceof EntityCyberCrab) return; // machines
+		if(entity.ridingEntity != null && entity.ridingEntity instanceof EntityRideableRocket) return; // breathe easy in your ship
+
+		if (!ArmorUtil.checkForOxy(entity, atmosphere)) {
+			HbmLivingProps.setOxy(entity, HbmLivingProps.getOxy(entity) - 1);
+		} else {
+			HbmLivingProps.setOxy(entity, 100); // 5 seconds until vacuum damage
+		}
+	}
+
+	// Corrosive atmospheres melt your suit, without appropriate protection
+	private static void handleCorrosion(EntityLivingBase entity, CBT_Atmosphere atmosphere) {
+		if(entity.worldObj.isRemote) return;
+		if(entity instanceof EntityGlyphid) return;
+		if(entity instanceof EntityCyberCrab) return;
+		if(entity.ridingEntity != null && entity.ridingEntity instanceof EntityRideableRocket) return;
+
+		// If we should corrode but we have armor, damage it heavily
+		// once it runs out of juice, fizzle it and start damaging the player
+		if(ArmorUtil.checkForCorrosion(entity, atmosphere)) {
+			entity.attackEntityFrom(ModDamageSource.acid, 1);
+		}
+	}
+
 	private static void handleDigamma(EntityLivingBase entity) {
 		
 		if(!entity.worldObj.isRemote) {
@@ -440,11 +495,11 @@ public class EntityEffectHandler {
 
 		double blacklung = Math.min(HbmLivingProps.getBlackLung(entity), HbmLivingProps.maxBlacklung);
 		double asbestos = Math.min(HbmLivingProps.getAsbestos(entity), HbmLivingProps.maxAsbestos);
-		double soot = PollutionHandler.getPollution(entity.worldObj, (int) Math.floor(entity.posX), (int) Math.floor(entity.posY + entity.getEyeHeight()), (int) Math.floor(entity.posZ), PollutionType.SOOT);
-		
-		if(!(entity instanceof EntityPlayer)) soot = 0;
-		
-		if(ArmorRegistry.hasProtection(entity, 3, HazardClass.PARTICLE_COARSE)) soot = 0;
+
+		double soot = 0;
+		if(entity instanceof EntityPlayer && !ArmorRegistry.hasProtection(entity, 3, HazardClass.PARTICLE_COARSE)) {
+			soot = PollutionHandler.getPollution(entity.worldObj, (int) Math.floor(entity.posX), (int) Math.floor(entity.posY + entity.getEyeHeight()), (int) Math.floor(entity.posZ), PollutionType.SOOT);
+		}
 		
 		boolean coughs = blacklung / HbmLivingProps.maxBlacklung > 0.25D || asbestos / HbmLivingProps.maxAsbestos > 0.25D || soot > 30;
 		
@@ -670,14 +725,13 @@ public class EntityEffectHandler {
 						player.addVelocity(lookingIn.xCoord * forward + strafeVec.xCoord * strafe, 0, lookingIn.zCoord * forward + strafeVec.zCoord * strafe);
 						player.motionY = 0;
 						player.fallDistance = 0F;
-						player.playSound("hbm:weapon.rocketFlame", 1.0F, 1.0F);
+						player.playSound("hbm:player.dash", 1.0F, 1.0F);
 						
 						props.setDashCooldown(HbmPlayerProps.dashCooldownLength);
 						stamina -= perDash;
 					}
 				} else {	
 					props.setDashCooldown(props.getDashCooldown() - 1);
-					props.setKeyPressed(EnumKeybind.DASH, false);
 				}
 						
 				if(stamina < props.getDashCount() * perDash) {
@@ -685,7 +739,7 @@ public class EntityEffectHandler {
 					
 					if(stamina % perDash == perDash-1) {
 						
-						player.playSound("hbm:item.techBoop", 1.0F, (1.0F + ((1F/12F)*(stamina/perDash))));
+						player.playSound("hbm:player.dashRecharge", 1.0F, (1.0F + ((1F/12F)*(stamina/perDash))));
 						stamina++;
 					}
 				}

@@ -44,7 +44,10 @@ public class Mats {
 	public static final int _VS = 0;
 	/* Alloy Space, up to 70 materials. Use >20_000 as an extension.*/
 	public static final int _AS = 30;
+	/* Bob's special corner */
 	public static final int _ES = 20_000;
+	/* make that >24_000 */
+	public static final int _EX = 24_000;
 	
 	//Vanilla and vanilla-like
 	public static final NTMMaterial MAT_STONE			= makeSmeltable(_VS + 00,	df("Stone"),		0x7F7F7F, 0x353535, 0x4D2F23).n();
@@ -64,7 +67,8 @@ public class Mats {
 	public static final NTMMaterial MAT_WROUGHTIRON		= makeSmeltable(2602,		df("WroughtIron"),	0xFAAB89).m();
 	public static final NTMMaterial MAT_PIGIRON			= makeSmeltable(2603,		df("PigIron"),		0xFF8B59).m();
 	public static final NTMMaterial MAT_METEORICIRON	= makeSmeltable(2604,		df("MeteoricIron"),	0x715347).m();
-	public static final NTMMaterial MAT_MALACHITE		= makeAdditive(	2901,		MALACHITE,			0xA2F0C8, 0x227048, 0x61AF87).m();
+	public static final NTMMaterial MAT_MALACHITE		= makeAdditive(	2901, 		MALACHITE,	0xA2F0C8, 0x227048, 0x61AF87).m();
+	public static final NTMMaterial MAT_CONGLOMERATE	= makeAdditive(	2993, 		CONGLOMERATE,	0x797979, 0x797979, 0x797979).m();
 
 	//Radioactive
 	public static final NTMMaterial MAT_URANIUM		= makeSmeltable(9200,		U,			0xC1C7BD, 0x2B3227, 0x9AA196).setShapes(FRAGMENT, NUGGET, BILLET, INGOT, DUST, BLOCK).m();
@@ -129,6 +133,11 @@ public class Mats {
 	public static final NTMMaterial MAT_SILICON			= makeSmeltable(1400,		SI,				0xD1D7DF, 0x1A1A3D, 0x878B9E).setShapes(FRAGMENT, NUGGET, BILLET, INGOT).m();
 	public static final NTMMaterial MAT_ASBESTOS		= makeSmeltable(1401,		ASBESTOS,		0xD8D9CF, 0x616258, 0xB0B3A8).setShapes(FRAGMENT, INGOT, BLOCK).n();
 	public static final NTMMaterial MAT_OSMIRIDIUM		= makeSmeltable(7699,		OSMIRIDIUM, 	0xDBE3EF, 0x7891BE, 0xACBDD9).setShapes(NUGGET, INGOT, CASTPLATE, WELDEDPLATE).m();
+	public static final NTMMaterial MAT_NICKEL		= makeSmeltable(2800,		NI,			0xAE9572, 0xAE9572, 0xAE9572).setShapes(NUGGET, INGOT, DUST, BLOCK).m();
+	public static final NTMMaterial MAT_GALLIUM		= makeSmeltable(3100,		GALLIUM,	0x52687F, 0x52687F, 0x52687F).setShapes(NUGGET, INGOT, DUST, DUSTTINY).m();
+	public static final NTMMaterial MAT_ZINC		= makeSmeltable(3000,		ZI,			0xA79DA8, 0xA79DA8, 0xA79DA8).setShapes(NUGGET, INGOT, DUST, WIRE).m(); //TODO: give this shit colors
+	public static final NTMMaterial MAT_IRIDIUM		= makeSmeltable(7700,		IRIDIUM,	0xB8D0FF, 0xB8D0FF, 0xB8D0FF).setShapes(INGOT).m();
+	public static final NTMMaterial MAT_PLATNIUM	= makeSmeltable(7800,		PLATNIUM,	0xE6E8F3, 0xE6E8F3, 0xE6E8F3).setShapes(NUGGET, INGOT, DUST).m();
 	
 	//Alloys
 	public static final NTMMaterial MAT_STEEL		= makeSmeltable(_AS + 0,	STEEL,		0xAFAFAF, 0x0F0F0F, 0x4A4A4A).setShapes(DUSTTINY, BOLT, WIRE, INGOT, DUST, PLATE, CASTPLATE, WELDEDPLATE, SHELL, PIPE, BLOCK, HEAVY_COMPONENT).m();
@@ -151,10 +160,17 @@ public class Mats {
 	public static final NTMMaterial MAT_SLAG		= makeSmeltable(_AS + 11,	SLAG,		0x554940, 0x34281F, 0x6C6562).setShapes(BLOCK).n();
 	public static final NTMMaterial MAT_MUD			= makeSmeltable(_AS + 14,	MUD,		0xBCB5A9, 0x481213, 0x96783B).setShapes(INGOT).n();
 	
-	//Extension
+
+	//Space extension alloys
+	public static final NTMMaterial MAT_GAAS		= makeSmeltable(_EX + 0,	GAAS,		0x6F4A57, 0x6F4A57, 0x6F4A57).setShapes(NUGGET, INGOT, BILLET).m();
+	public static final NTMMaterial MAT_STAINLESS	= makeSmeltable(_EX + 1,	STAINLESS,	0x4A4A4A, 0x4A4A4A, 0x4A4A4A).setShapes(INGOT, PLATE).m();
+
+	//Bob's rare delicacies
 	public static final NTMMaterial MAT_RAREEARTH	= makeNonSmeltable(_ES + 00, 		RAREEARTH,		0xC1BDBD, 0x384646, 0x7B7F7F).setShapes(FRAGMENT, INGOT).n();
-	
+
+
 	public static NTMMaterial makeSmeltable(int id, DictFrame dict, int color) { return makeSmeltable(id, dict, color, color, color); }
+
 
 	public static NTMMaterial make(int id, DictFrame dict) {
 		return new NTMMaterial(id, dict);

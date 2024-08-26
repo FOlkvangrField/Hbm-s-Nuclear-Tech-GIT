@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FT_Combustible.FuelGrade;
 import com.hbm.inventory.fluid.trait.FluidTrait.FluidReleaseType;
 import com.hbm.inventory.gui.GUIMachineDiesel;
@@ -127,7 +128,6 @@ public class TileEntityMachineDiesel extends TileEntityMachinePolluting implemen
 	public void updateEntity() {
 		
 		if(!worldObj.isRemote) {
-			
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				this.tryProvide(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, dir);
 				this.sendSmoke(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, dir);
@@ -193,7 +193,7 @@ public class TileEntityMachineDiesel extends TileEntityMachinePolluting implemen
 	public void generate() {
 		
 		if(hasAcceptableFuel()) {
-			if (tank.getFill() > 0) {
+			if (tank.getFill() > 0 && breatheAir(1)) {
 				
 				if(!shutUp) {
 					if (soundCycle == 0) {

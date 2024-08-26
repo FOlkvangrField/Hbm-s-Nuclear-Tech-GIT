@@ -1,7 +1,10 @@
 package com.hbm.blocks.bomb;
 
+import org.apache.logging.log4j.Level;
+
 import com.hbm.blocks.ModBlocks;
 import com.hbm.config.BombConfig;
+import com.hbm.config.GeneralConfig;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.item.EntityTNTPrimedBase;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
@@ -9,6 +12,7 @@ import com.hbm.explosion.ExplosionLarge;
 import com.hbm.explosion.ExplosionNT;
 import com.hbm.interfaces.IBomb;
 import com.hbm.lib.RefStrings;
+import com.hbm.main.MainRegistry;
 
 import net.minecraft.util.MathHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -16,7 +20,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -34,15 +40,21 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 	public void registerBlockIcons(IIconRegister iconRegister) {
 
 		super.registerBlockIcons(iconRegister);
-
-		this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_nuke_top");
+		if(this == ModBlocks.det_nuke)
+		{
+			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_nuke_top");	
+		}
+		if(this == ModBlocks.det_salt)
+		{
+			this.iconTop = iconRegister.registerIcon(RefStrings.MODID + ":det_cobalt_top");	
+		}
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int metadata) {
 
-		if(this != ModBlocks.det_nuke)
+		if(this != ModBlocks.det_nuke && this != ModBlocks.det_salt)
 			return this.blockIcon;
 
 		return side == 1 ? this.iconTop : (side == 0 ? this.iconTop : this.blockIcon);
@@ -71,9 +83,22 @@ public class ExplosiveCharge extends BlockDetonatable implements IBomb, IDetConn
 				world.spawnEntityInWorld(EntityNukeExplosionMK5.statFac(world, BombConfig.missileRadius, x + 0.5, y + 0.5, z + 0.5));
 				EntityNukeTorex.statFac(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
 			}
+			if(this == ModBlocks.det_salt) {
+				world.spawnEntityInWorld(EntityNukeExplosionMK5.statFacSalted(world, BombConfig.missileRadius, x + 0.5, y + 0.5, z + 0.5));
+
+				EntityNukeTorex.statFac(world, x + 0.5, y + 0.5, z + 0.5, BombConfig.missileRadius);
+			}
 		}
 
 		return BombReturnCode.DETONATED;
+	}
+	@Override
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack) {
+		if(!world.isRemote) {
+			if(GeneralConfig.enableExtendedLogging) {
+				MainRegistry.logger.log(Level.INFO, "[BOMBPL]" + this.getLocalizedName() + " placed at " + x + " / " + y + " / " + z + "! " + "by "+ player.getCommandSenderName());
+		}	
+	}
 	}
 
 	@Override

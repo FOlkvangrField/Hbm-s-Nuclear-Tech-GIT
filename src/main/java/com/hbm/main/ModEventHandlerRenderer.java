@@ -5,24 +5,29 @@ import org.lwjgl.opengl.GLContext;
 
 import com.hbm.blocks.ICustomBlockHighlight;
 import com.hbm.config.RadiationConfig;
+import com.hbm.dim.CelestialBody;
+import com.hbm.dim.WorldProviderCelestial;
+import com.hbm.dim.trait.CBT_Atmosphere;
+import com.hbm.extprop.HbmLivingProps;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
 import com.hbm.items.armor.IArmorDisableModel;
 import com.hbm.items.armor.IArmorDisableModel.EnumPlayerPart;
+import com.hbm.items.armor.ItemModOxy;
 import com.hbm.packet.PermaSyncHandler;
 import com.hbm.render.model.ModelMan;
-import com.hbm.world.biome.BiomeGenCraterBase;
+import com.hbm.util.ArmorUtil;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
@@ -30,16 +35,14 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogColors;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogDensity;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.common.ForgeModContainer;
 
 public class ModEventHandlerRenderer {
 
@@ -252,7 +255,7 @@ public class ModEventHandlerRenderer {
 	public void onDrawHighlight(DrawBlockHighlightEvent event) {
 		MovingObjectPosition mop = event.target;
 		
-		if(mop != null && mop.typeOfHit == mop.typeOfHit.BLOCK) {
+		if(mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
 			Block b = event.player.worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
 			if(b instanceof ICustomBlockHighlight) {
 				ICustomBlockHighlight cus = (ICustomBlockHighlight) b;
@@ -264,83 +267,13 @@ public class ModEventHandlerRenderer {
 			}
 		}
 	}
-
-	//private ResourceLocation ashes = new ResourceLocation(RefStrings.MODID + ":textures/misc/overlay_ash.png");
-	public static int currentBrightness = 0;
-	public static int lastBrightness = 0;
-
-	/*@SubscribeEvent
-	public void onOverlayRender(RenderGameOverlayEvent.Pre event) {
-
-		if(event.type == ElementType.PORTAL) {
-
-			Minecraft mc = Minecraft.getMinecraft();
-
-			ScaledResolution resolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-
-			GL11.glPushMatrix();
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			GL11.glDepthMask(false);
-			GL11.glEnable(GL11.GL_BLEND);
-			OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-			GL11.glEnable(GL11.GL_ALPHA_TEST);
-			GL11.glAlphaFunc(GL11.GL_GEQUAL, 0.0F);
-
-			int w = resolution.getScaledWidth();
-			int h = resolution.getScaledHeight();
-			double off = System.currentTimeMillis() / 10000D % 10000D;
-			double aw = 1;
-
-			Tessellator tessellator = Tessellator.instance;
-
-			int cX = currentBrightness % 65536;
-			int cY = currentBrightness / 65536;
-			int lX = lastBrightness % 65536;
-			int lY = lastBrightness / 65536;
-			float interp = (mc.theWorld.getTotalWorldTime() % 20) * 0.05F;
-
-			if(mc.theWorld.getTotalWorldTime() == 1)
-				lastBrightness = currentBrightness;
-
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) (lX + (cX - lX) * interp) / 1.0F, (float) (lY + (cY - lY) * interp) / 1.0F);
-
-			// mc.entityRenderer.enableLightmap((double)event.partialTicks);
-
-			mc.getTextureManager().bindTexture(ashes);
-
-			for(int i = 1; i < 3; i++) {
-
-				GL11.glTranslated(w, h, 0);
-				GL11.glRotatef(-15, 0, 0, 1);
-				GL11.glTranslated(-w, -h, 0);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, BlockAshes.ashes / 256F * 0.98F / i);
-
-				tessellator.startDrawingQuads();
-				tessellator.addVertexWithUV(-w * 1.25, h * 1.25, aw, 0.0D + off * i, 1.0D);
-				tessellator.addVertexWithUV(w * 1.25, h * 1.25, aw, 1.0D + off * i, 1.0D);
-				tessellator.addVertexWithUV(w * 1.25, -h * 1.25, aw, 1.0D + off * i, 0.0D);
-				tessellator.addVertexWithUV(-w * 1.25, -h * 1.25, aw, 0.0D + off * i, 0.0D);
-				tessellator.draw();
-			}
-
-			mc.entityRenderer.disableLightmap((double) event.partialTicks);
-
-			GL11.glDepthMask(true);
-			GL11.glEnable(GL11.GL_DEPTH_TEST);
-			GL11.glDisable(GL11.GL_BLEND);
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			GL11.glAlphaFunc(GL11.GL_GEQUAL, 0.1F);
-
-			GL11.glPopMatrix();
-		}
-	}*/
 	
 	float renderSoot = 0;
 	
 	@SubscribeEvent
 	public void worldTick(WorldTickEvent event) {
 		
-		if(event.phase == event.phase.START && RadiationConfig.enableSootFog) {
+		if(event.phase == WorldTickEvent.Phase.START && RadiationConfig.enableSootFog) {
 
 			float step = 0.05F;
 			float soot = PermaSyncHandler.pollution[PollutionType.SOOT.ordinal()];
@@ -357,7 +290,25 @@ public class ModEventHandlerRenderer {
 
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void thickenFog(FogDensity event) {
+		if(event.entity.worldObj.provider instanceof WorldProviderCelestial) {
+			WorldProviderCelestial provider = (WorldProviderCelestial) event.entity.worldObj.provider;
+			float fogDensity = provider.fogDensity();
+			
+			if(fogDensity > 0) {
+				if(GLContext.getCapabilities().GL_NV_fog_distance) {
+					GL11.glFogi(34138, 34139);
+				}
+				GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
+	
+				event.density = fogDensity;
+				event.setCanceled(true);
+
+				return;
+			}
+		}
+
 		float soot = (float) (renderSoot - RadiationConfig.sootFogThreshold);
+
 		if(soot > 0 && RadiationConfig.enableSootFog) {
 			
 			float farPlaneDistance = (float) (Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 16);
@@ -368,24 +319,13 @@ public class ModEventHandlerRenderer {
 			if(GLContext.getCapabilities().GL_NV_fog_distance) {
 				GL11.glFogi(34138, 34139);
 			}
-			//GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
-			//GL11.glFogf(GL11.GL_FOG_DENSITY, 2F);
+			
 			event.setCanceled(true);
 		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void tintFog(FogColors event) {
-		
-		EntityPlayer player = MainRegistry.proxy.me();
-		if(player.worldObj.getBlock((int) Math.floor(player.posX), (int) Math.floor(player.posY), (int) Math.floor(player.posZ)).getMaterial() != Material.water) {
-			Vec3 color = getFogBlendColor(player.worldObj, (int) Math.floor(player.posX), (int) Math.floor(player.posZ), event.red, event.green, event.blue, event.renderPartialTicks);
-			if(color != null) {
-				event.red = (float) color.xCoord;
-				event.green = (float) color.yCoord;
-				event.blue = (float) color.zCoord;
-			}
-		}
 		
 		float soot = (float) (renderSoot - RadiationConfig.sootFogThreshold);
 		float sootColor = 0.15F;
@@ -400,86 +340,71 @@ public class ModEventHandlerRenderer {
 	
 	@SubscribeEvent
 	public void onRenderHUD(RenderGameOverlayEvent.Pre event) {
+		Tessellator tess = Tessellator.instance;
 		
 		if(event.type == ElementType.HOTBAR && (ModEventHandlerClient.shakeTimestamp + ModEventHandlerClient.shakeDuration - System.currentTimeMillis()) > 0) {
 			double mult = (ModEventHandlerClient.shakeTimestamp + ModEventHandlerClient.shakeDuration - System.currentTimeMillis()) / (double) ModEventHandlerClient.shakeDuration * 2;
 			double horizontal = MathHelper.clamp_double(Math.sin(System.currentTimeMillis() * 0.02), -0.7, 0.7) * 15;
 			double vertical = MathHelper.clamp_double(Math.sin(System.currentTimeMillis() * 0.01 + 2), -0.7, 0.7) * 3;
 			GL11.glTranslated(horizontal * mult, vertical * mult, 0);
-		}
-	}
+		} else if(event.type == ElementType.AIR) {
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			int width = event.resolution.getScaledWidth();
+			int height = event.resolution.getScaledHeight();
 
-	private static boolean fogInit = false;
-	private static int fogX;
-	private static int fogZ;
-	private static Vec3 fogRGBMultiplier;
-	private static boolean doesBiomeApply = false;
-	private static long fogTimer = 0;
+			// If we're suffocating for a reason other than water, render the HUD bubbles
+			int air = HbmLivingProps.getOxy(player);
+			if(air < 100) {
+				GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
 	
-	/** Same procedure as getting the blended sky color but for fog */
-	public static Vec3 getFogBlendColor(World world, int playerX, int playerZ, float red, float green, float blue, double partialTicks) {
-		
-		long millis = System.currentTimeMillis() - fogTimer;
-		if(playerX == fogX && playerZ == fogZ && fogInit && millis < 3000) return fogRGBMultiplier;
+				GL11.glEnable(GL11.GL_BLEND);
+				int left = width / 2 + 91;
+				int top = height - GuiIngameForge.right_height;
+	
+				int full = MathHelper.ceiling_double_int((double)(air - 2) * 10.0D / 100.0D);
+				int partial = MathHelper.ceiling_double_int((double)air * 10.0D / 100.0D) - full;
 
-		fogInit = true;
-		fogTimer = System.currentTimeMillis();
-		GameSettings settings = Minecraft.getMinecraft().gameSettings;
-		int[] ranges = ForgeModContainer.blendRanges;
-		int distance = 0;
-		
-		if(settings.fancyGraphics && settings.renderDistanceChunks >= 0) {
-			distance = ranges[Math.min(settings.renderDistanceChunks, ranges.length - 1)];
-		}
+				for(int i = 0; i < full + partial; ++i) {
+					gui.drawTexturedModalRect(left - i * 8 - 9, top, (i < full ? 16 : 25), 18, 9, 9);
+				}
+				GuiIngameForge.right_height += 10;
+	
+				GL11.glDisable(GL11.GL_BLEND);
+	
+				// Prevent regular bubbles rendering
+				event.setCanceled(true);
+			}
+			
+			ItemStack tankStack = ArmorUtil.getOxygenTank(player);
+			if(tankStack != null) {
+				ItemModOxy tank = (ItemModOxy)tankStack.getItem();
+				
+				float tot = (float)ItemModOxy.getFuel(tankStack) / (float)tank.getMaxFuel();
+				
+				GL11.glDisable(GL11.GL_TEXTURE_2D);
+				int right = width / 2 + 91;
+				int top = height - GuiIngameForge.right_height + 3;
 
-		float r = 0F;
-		float g = 0F;
-		float b = 0F;
-		
-		int divider = 0;
-		doesBiomeApply = false;
-		
-		for(int x = -distance; x <= distance; x++) {
-			for(int z = -distance; z <= distance; z++) {
-				BiomeGenBase biome = world.getBiomeGenForCoords(playerX + x,  playerZ + z);
-				Vec3 color = getBiomeFogColors(world, biome, red, green, blue, partialTicks);
-				r += color.xCoord;
-				g += color.yCoord;
-				b += color.zCoord;
-				divider++;
+				tess.startDrawingQuads();
+				tess.setColorOpaque_F(0.25F, 0.25F, 0.25F);
+				tess.addVertex(right - 81.5, top - 0.5, 0);
+				tess.addVertex(right - 81.5, top + 4.5, 0);
+				tess.addVertex(right + 0.5, top + 4.5, 0);
+				tess.addVertex(right + 0.5, top - 0.5, 0);
+
+				tess.setColorOpaque_F(1F - tot, tot, tot);
+				tess.addVertex(right - 81 * tot, top, 0);
+				tess.addVertex(right - 81 * tot, top + 4, 0);
+				tess.addVertex(right, top + 4, 0);
+				tess.addVertex(right, top, 0);
+				tess.draw();
+
+				GL11.glEnable(GL11.GL_TEXTURE_2D);
+				
+				GuiIngameForge.right_height += 6;
+
+				event.setCanceled(true);
 			}
 		}
-
-		fogX = playerX;
-		fogZ = playerZ;
-		
-		if(doesBiomeApply) {
-			fogRGBMultiplier = Vec3.createVectorHelper(r / divider, g / divider, b / divider);
-		} else {
-			fogRGBMultiplier = null;
-		}
-
-		return fogRGBMultiplier;
-	}
-	
-	/** Returns the current biome's fog color adjusted for brightness if in a crater, or the world's cached fog color if not */
-	public static Vec3 getBiomeFogColors(World world, BiomeGenBase biome, float r, float g, float b, double partialTicks) {
-		
-		if(biome instanceof BiomeGenCraterBase) {
-			int color = biome.getSkyColorByTemp(biome.temperature);
-			r = ((color & 0xff0000) >> 16) / 255F;
-			g = ((color & 0x00ff00) >> 8) / 255F;
-			b = (color & 0x0000ff) / 255F;
-			
-			float celestialAngle = world.getCelestialAngle((float) partialTicks);
-			float skyBrightness = MathHelper.clamp_float(MathHelper.cos(celestialAngle * (float) Math.PI * 2.0F) * 2.0F + 0.5F, 0F, 1F);
-			r *= skyBrightness;
-			g *= skyBrightness;
-			b *= skyBrightness;
-			
-			doesBiomeApply = true;
-		}
-		
-		return Vec3.createVectorHelper(r, g, b);
 	}
 }

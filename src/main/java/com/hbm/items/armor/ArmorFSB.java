@@ -71,6 +71,7 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 	public String step;
 	public String jump;
 	public String fall;
+	public boolean canSeal;
 
 	public ArmorFSB(ArmorMaterial material, int slot, String texture) {
 		super(material, 0, slot);
@@ -187,6 +188,11 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 		return this;
 	}
 
+	public ArmorFSB setSealed(boolean canSeal) {
+		this.canSeal = canSeal;
+		return this;
+	}
+
 	public ArmorFSB cloneStats(ArmorFSB original) {
 
 		//lists aren't being modified after instantiation, so there's no need to dereference
@@ -211,6 +217,7 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 		this.step = original.step;
 		this.jump = original.jump;
 		this.fall = original.fall;
+		this.canSeal = original.canSeal;
 		//overlay doesn't need to be copied because it's helmet exclusive
 		return this;
 	}
@@ -224,6 +231,10 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean bool) {
 
 		list.add(EnumChatFormatting.GOLD + I18nUtil.resolveKey("armor.fullSetBonus"));
+
+		if(canSeal) {
+			list.add(EnumChatFormatting.BLUE + "  " + I18n.format("armor.canSeal"));
+		}
 
 		if(!effects.isEmpty()) {
 
@@ -476,6 +487,46 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 				} catch(Exception x) {
 				}
 			}
+			/*
+			if(dashCount > 0) {
+				
+				int perDash = 60;
+				
+				HbmPlayerProps props = (HbmPlayerProps) player.getExtendedProperties("NTM_EXT_PLAYER");
+				
+				props.setDashCount(dashCount);
+				
+				int stamina = props.getStamina();
+
+				if(props.getDashCooldown() <= 0) {
+					
+					if(!player.capabilities.isFlying && player.isSneaking() && stamina >= perDash) {
+						
+						Vec3 lookingIn = player.getLookVec();
+						lookingIn.yCoord = 0;
+						lookingIn.normalize();
+						player.addVelocity(lookingIn.xCoord, 0, lookingIn.zCoord);
+						player.playSound("hbm:player.dash", 1.0F, 1.0F);
+						
+						props.setDashCooldown(HbmPlayerProps.dashCooldownLength);
+						stamina -= perDash;
+					}
+				} else {	
+					props.setDashCooldown(props.getDashCooldown() - 1);
+				}
+				
+				if(stamina < props.getDashCount() * perDash) {
+					stamina++;
+					
+					if(stamina % perDash == perDash-1) {
+						
+						player.playSound("hbm:player.dashRecharge", 1.0F, (1.0F + ((1F/12F)*(stamina/perDash))));
+						stamina++;
+					}
+				}
+				
+				props.setStamina(stamina);
+			}	*/
 		}
 	}
 
@@ -490,13 +541,13 @@ public class ArmorFSB extends ItemArmor implements IArmorDisableModel {
 		}
 	}
 
-	public void handleFall(EntityPlayer player) {
+	public void handleFall(EntityPlayer player, float fallDistance) {
 
 		if(ArmorFSB.hasFSBArmor(player)) {
 
 			ArmorFSB chestplate = (ArmorFSB) player.inventory.armorInventory[2].getItem();
 
-			if(chestplate.hardLanding && player.fallDistance > 10) {
+			if(chestplate.hardLanding && fallDistance > 10) {
 
 				// player.playSound(Block.soundTypeAnvil.func_150496_b(), 2.0F,
 				// 0.5F);

@@ -118,7 +118,6 @@ public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implem
 	public void updateEntity() {
 		
 		if(!worldObj.isRemote) {
-			
 			this.output = 0;
 			this.consumption = 0;
 			
@@ -163,7 +162,7 @@ public class TileEntityMachineTurbofan extends TileEntityMachinePolluting implem
 				burnValue = tank.getTankType().getTrait(FT_Combustible.class).getCombustionEnergy() / 1_000;
 			}
 			
-			int amountToBurn = Math.min(amount, this.tank.getFill());
+			int amountToBurn = breatheAir(this.tank.getFill() > 0 ? amount : 0) ? Math.min(amount, this.tank.getFill()) : 0;
 			
 			if(amountToBurn > 0) {
 				this.wasOn = true;

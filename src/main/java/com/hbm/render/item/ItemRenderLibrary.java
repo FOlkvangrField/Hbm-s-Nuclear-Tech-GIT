@@ -317,7 +317,6 @@ public class ItemRenderLibrary {
 				ResourceManager.turbofan.renderPart("Afterburner");
 				GL11.glShadeModel(GL11.GL_FLAT);
 			}});
-		
 		renderers.put(Item.getItemFromBlock(ModBlocks.plasma_heater), new ItemRenderBase() {
 			public void renderInventory() {
 				GL11.glTranslated(0, -1, 0);
@@ -650,6 +649,22 @@ public class ItemRenderLibrary {
 		        bindTexture(ResourceManager.satdock_tex); ResourceManager.satDock.renderAll();
 			}});
 		
+		renderers.put(Item.getItemFromBlock(ModBlocks.transporter_rocket), new ItemRenderBase() {
+			public void renderInventory() {
+				GL11.glScaled(3, 3, 3);
+			}
+			public void renderCommon() {
+				GL11.glRotated(90, 0, -1, 0);
+				bindTexture(ResourceManager.satdock_tex); ResourceManager.satDock.renderAll();
+			}});
+		renderers.put(Item.getItemFromBlock(ModBlocks.gas_dock), new ItemRenderBase() {
+			public void renderInventory() {
+				GL11.glScaled(3, 3, 3);
+			}
+			public void renderCommon() {
+				GL11.glRotated(90, 0, -1, 0);
+				bindTexture(ResourceManager.satdock_tex); ResourceManager.satDock.renderAll();
+			}});
 		renderers.put(Item.getItemFromBlock(ModBlocks.vault_door), new ItemRenderBase() {
 			public void renderInventory() {
 				GL11.glTranslated(0, -5, 0);
@@ -1079,6 +1094,17 @@ public class ItemRenderLibrary {
 				bindTexture(ResourceManager.orbus_tex); ResourceManager.orbus.renderAll();
 				GL11.glShadeModel(GL11.GL_FLAT);
 			}});
+		renderers.put(Item.getItemFromBlock(ModBlocks.nuke_antimatter), new ItemRenderBase() {
+			public void renderInventory() {
+				GL11.glTranslated(0, 7, 0);
+				GL11.glScaled(3.25, 3.25, 3.25);
+				GL11.glRotatef(180, 90, 0, 0);
+			}
+			public void renderCommon() {
+				GL11.glShadeModel(GL11.GL_SMOOTH);
+				bindTexture(ResourceManager.Antimatter_tex); ResourceManager.Antimatter.renderAll();
+				GL11.glShadeModel(GL11.GL_FLAT);
+			}});
 		
 		renderers.put(Item.getItemFromBlock(ModBlocks.watz), new ItemRenderBase() {
 			public void renderInventory() {
@@ -1133,6 +1159,33 @@ public class ItemRenderLibrary {
 				bindTexture(ResourceManager.tower_large_tex); ResourceManager.tower_large.renderAll();
 				GL11.glShadeModel(GL11.GL_FLAT);
 			}});
+		renderers.put(Item.getItemFromBlock(ModBlocks.machine_atmo_tower), new ItemRenderBase() {
+			public void renderInventory() {
+				GL11.glTranslated(0, -5, 0);
+				GL11.glScaled(4, 4, 4);
+			}
+
+			public void renderCommon() {
+				GL11.glRotated(180, 0, 1, 0);
+				GL11.glScaled(0.5, 0.5, 0.5);
+				GL11.glShadeModel(GL11.GL_SMOOTH);
+				bindTexture(ResourceManager.atmo_tower_tex); ResourceManager.atmo_tower.renderAll();
+				GL11.glShadeModel(GL11.GL_FLAT);
+			}});
+		renderers.put(Item.getItemFromBlock(ModBlocks.machine_atmo_vent), new ItemRenderBase() {
+			public void renderInventory() {
+				GL11.glTranslated(0, -4, 0);
+				GL11.glScaled(6, 6, 6);
+			}
+
+			public void renderCommon() {
+				GL11.glRotated(180, 0, 1, 0);
+				GL11.glScaled(0.5, 0.5, 0.5);
+				GL11.glShadeModel(GL11.GL_SMOOTH);
+				bindTexture(ResourceManager.atmo_vent_tex); ResourceManager.atmo_vent.renderAll();
+				GL11.glShadeModel(GL11.GL_FLAT);
+			}});
+
 		
 		renderers.put(Item.getItemFromBlock(ModBlocks.machine_fracking_tower), new ItemRenderBase() {
 			public void renderInventory() {

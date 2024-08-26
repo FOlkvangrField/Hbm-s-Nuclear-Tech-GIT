@@ -2,6 +2,11 @@ package com.hbm.tileentity.machine.storage;
 
 import api.hbm.fluid.*;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.entity.effect.EntityCloudFleija;
+import com.hbm.entity.effect.EntityNukeTorex;
+import com.hbm.entity.logic.EntityBalefire;
+import com.hbm.entity.logic.EntityNukeExplosionMK3;
+import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.handler.CompatHandler;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.container.ContainerBarrel;
@@ -9,12 +14,14 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Corrosive;
+import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FluidTrait.FluidReleaseType;
 import com.hbm.inventory.gui.GUIBarrel;
 import com.hbm.lib.Library;
 import com.hbm.saveddata.TomSaveData;
 import com.hbm.tileentity.IGUIProvider;
+import com.hbm.tileentity.IOverpressurable;
 import com.hbm.tileentity.IPersistentNBT;
 import com.hbm.tileentity.TileEntityMachineBase;
 import com.hbm.util.fauxpointtwelve.DirPos;
@@ -35,6 +42,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -43,13 +51,16 @@ import java.util.List;
 import java.util.Set;
 
 @Optional.InterfaceList({@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")})
-public class TileEntityBarrel extends TileEntityMachineBase implements SimpleComponent, IFluidStandardTransceiver, IPersistentNBT, IGUIProvider, CompatHandler.OCComponent {
+public class TileEntityBarrel extends TileEntityMachineBase implements SimpleComponent, IFluidStandardTransceiver, IPersistentNBT, IGUIProvider, CompatHandler.OCComponent, IOverpressurable {
 	
+	public boolean hasExploded = false;
 	public FluidTank tank;
 	public short mode = 0;
 	public static final short modes = 4;
 	public int age = 0;
 	protected boolean sendingBrake = false;
+	
+	public Explosion lastExplosion = null;
 	public byte lastRedstone = 0;
 
 	public TileEntityBarrel() {
@@ -96,6 +107,7 @@ public class TileEntityBarrel extends TileEntityMachineBase implements SimpleCom
 	public void updateEntity() {
 		
 		if(!worldObj.isRemote) {
+			if(!this.hasExploded) {
 
 			byte comp = this.getComparatorPower(); //do comparator shenanigans
 			if(comp != this.lastRedstone) {
@@ -117,6 +129,7 @@ public class TileEntityBarrel extends TileEntityMachineBase implements SimpleCom
 			}
 			
 			this.networkPackNT(50);
+		}
 		}
 	}
 
@@ -229,7 +242,8 @@ public class TileEntityBarrel extends TileEntityMachineBase implements SimpleCom
 		//for when you fill antimatter into a matter tank
 		if(b != ModBlocks.barrel_antimatter && tank.getTankType().isAntimatter()) {
 			worldObj.func_147480_a(xCoord, yCoord, zCoord, false);
-			worldObj.newExplosion(null, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, 5, true, true);
+			new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, 5).makeAmat().explode();
+			//worldObj.newExplosion(null, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, 5, true, true);
 		}
 		
 		//for when you fill hot or corrosive liquids into a plastic tank
@@ -360,6 +374,48 @@ public class TileEntityBarrel extends TileEntityMachineBase implements SimpleCom
 	public Object[] getInfo(Context context, Arguments args) {
 		return new Object[]{tank.getFill(), tank.getMaxFill(), tank.getTankType().getName()};
 	}
+
+	@Override
+	public void explode(World world, int x, int y, int z) {
+		if(tank.getTankType() == Fluids.AMAT || tank.getTankType() == Fluids.ASCHRAB) {
+		//if(this.hasExploded) return;
+	    	float amat = Math.min(tank.getFill()/100,90);
+	    	float aschrab = Math.min(tank.getFill()/100,90);
+	    	if(this.hasExploded && !worldObj.isRemote) {
+	    		if(amat>0)
+	    		{
+	    			if(amat >= 25)
+	    			{
+	    				EntityBalefire bf = new EntityBalefire(worldObj);
+	    				bf.antimatter();
+	    	    		bf.setPosition(xCoord, yCoord, zCoord);
+	    				bf.destructionRange = (int) amat;
+	    				worldObj.spawnEntityInWorld(bf);
+	    				EntityNukeTorex.startFacAnti(worldObj, xCoord, yCoord, zCoord, amat * 1.5F);
+	    				return;
+	    			}
+	    			else
+	    			{
+	    				new ExplosionVNT(worldObj, xCoord, yCoord, zCoord, amat).makeAmat().explode();
+	    			}
+	    		}
+	    		if(aschrab>0)
+	    		{
+	    			EntityNukeExplosionMK3 ex = EntityNukeExplosionMK3.statFacFleija(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, (int) aschrab);
+	    			if(!ex.isDead) {
+	    				worldObj.spawnEntityInWorld(ex);
+	    	
+	    				EntityCloudFleija cloud = new EntityCloudFleija(worldObj, (int) aschrab);
+	    				cloud.setPosition(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+	    				worldObj.spawnEntityInWorld(cloud);
+	    			}
+	    			return;			
+	    		}	
+	    	}
+		}
+	    	this.markChanged();
+	    	
+	    }
 
 	@Override
 	@Optional.Method(modid = "OpenComputers")

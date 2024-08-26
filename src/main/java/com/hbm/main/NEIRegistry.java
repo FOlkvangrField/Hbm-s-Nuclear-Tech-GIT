@@ -10,7 +10,7 @@ import codechicken.nei.recipe.TemplateRecipeHandler;
 
 public class NEIRegistry {
 
-	public static List<TemplateRecipeHandler> handlers = new ArrayList();
+	public static List<TemplateRecipeHandler> handlers = new ArrayList<>();
 	
 	public static List<TemplateRecipeHandler> listAllHandlers() {
 		
@@ -29,6 +29,8 @@ public class NEIRegistry {
 		handlers.add(new RefineryRecipeHandler());
 		handlers.add(new VacuumRecipeHandler());
 		handlers.add(new CrackingHandler());
+		handlers.add(new AlkylationHandler());
+		handlers.add(new CryoHandler());
 		handlers.add(new RadiolysisRecipeHandler());
 		handlers.add(new ReformingHandler());
 		handlers.add(new HydrotreatingHandler());
@@ -62,6 +64,7 @@ public class NEIRegistry {
 		handlers.add(new AshpitHandler());
 		handlers.add(new ArcWelderHandler());
 		handlers.add(new SolderingStationHandler());
+		handlers.add(new VacuumCircuitHandler());
 		handlers.add(new ExposureChamberHandler());
 		handlers.add(new ArcFurnaceSolidHandler());
 		handlers.add(new ArcFurnaceFluidHandler());

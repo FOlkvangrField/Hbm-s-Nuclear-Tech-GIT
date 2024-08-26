@@ -6,6 +6,7 @@ import java.util.List;
 
 import static com.hbm.inventory.OreDictManager.*;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockBobble.BobbleType;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
@@ -15,6 +16,7 @@ import com.hbm.items.machine.ItemCircuit.EnumCircuitType;
 
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class MagicRecipes {
@@ -102,7 +104,12 @@ public class MagicRecipes {
 		recipes.add(new MagicRecipe(new ItemStack(ModItems.ammo_dart, 4, ItemAmmoEnums.AmmoDart.NUCLEAR.ordinal()),
 				new OreDictStack(ANY_RUBBER.ingot()),
 				new ComparableStack(ModItems.nugget_pu239),
-				new ComparableStack(ModItems.circuit, 1, EnumCircuitType.CHIP)));
+				new ComparableStack(ModItems.circuit, 1, EnumCircuitType.VACUUM_TUBE)));
+		
+		recipes.add(new MagicRecipe(new ItemStack(Item.getItemFromBlock(ModBlocks.bobblehead), 1, 21),
+				new ComparableStack(ModItems.ingot_gwenium),
+				new ComparableStack(ModItems.ingot_dineutronium),
+				new ComparableStack(ModItems.ingot_dineutronium)));
 	}
 	
 	public static List<MagicRecipe> getRecipes() {

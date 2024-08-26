@@ -3,6 +3,7 @@ package com.hbm.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hbm.dim.BiomeGenBaseCelestial;
 import com.hbm.entity.cart.*;
 import com.hbm.entity.effect.*;
 import com.hbm.entity.grenade.*;
@@ -14,6 +15,7 @@ import com.hbm.entity.missile.EntityMissileTier1.*;
 import com.hbm.entity.missile.EntityMissileTier2.*;
 import com.hbm.entity.missile.EntityMissileTier3.*;
 import com.hbm.entity.missile.EntityMissileTier4.*;
+import com.hbm.entity.missile.EntityRideableRocket.EntityRideableRocketDummy;
 import com.hbm.entity.mob.*;
 import com.hbm.entity.mob.botprime.*;
 import com.hbm.entity.mob.glyphid.*;
@@ -159,6 +161,8 @@ public class EntityMappings {
 		addEntity(EntityWaterSplash.class, "entity_water_splash", 1000);
 		addEntity(EntityBobmazon.class, "entity_bobmazon_delivery", 1000);
 		addEntity(EntityMissileCustom.class, "entity_custom_missile", 1000);
+		addEntity(EntityRideableRocket.class, "entity_rideable_rocket", 1000);
+		addEntity(EntityRideableRocketDummy.class, "entity_rideable_rocket_dummy", 1000);
 		addEntity(EntityBalefire.class, "entity_balefire", 1000);
 		addEntity(EntityTom.class, "entity_tom_the_moonstone", 1000);
 		addEntity(EntityTomBlast.class, "entity_tom_bust", 1000);
@@ -220,12 +224,14 @@ public class EntityMappings {
 
 		addEntity(EntityDisperserCanister.class, "entity_disperser", 250);
 		addEntity(EntityWaypoint.class, "entity_waypoint", 250, false);
+		addMob(EntityWarBehemoth.class, "entity_war_behemoth", 0x204131, 0x75CE00);
 
 		addMob(EntityCreeperNuclear.class, "entity_mob_nuclear_creeper", 0x204131, 0x75CE00);
 		addMob(EntityCreeperTainted.class, "entity_mob_tainted_creeper", 0x813b9b, 0xd71fdd);
 		addMob(EntityCreeperPhosgene.class, "entity_mob_phosgene_creeper", 0xE3D398, 0xB8A06B);
 		addMob(EntityCreeperVolatile.class, "entity_mob_volatile_creeper", 0xC28153, 0x4D382C);
 		addMob(EntityCreeperGold.class, "entity_mob_gold_creeper", 0xECC136, 0x9E8B3E);
+		addMob(EntityCreeperFlesh.class, "entity_mob_flesh_creeper", 0xFF0000, 0xD65337);
 		addMob(EntityHunterChopper.class, "entity_mob_hunter_chopper", 0x000020, 0x2D2D72);
 		addMob(EntityCyberCrab.class, "entity_cyber_crab", 0xAAAAAA, 0x444444);
 		addMob(EntityTeslaCrab.class, "entity_tesla_crab", 0xAAAAAA, 0x440000);
@@ -234,6 +240,8 @@ public class EntityMappings {
 		addMob(EntityDuck.class, "entity_fucc_a_ducc", 0xd0d0d0, 0xFFBF00);
 		addMob(EntityQuackos.class, "entity_elder_one", 0xd0d0d0, 0xFFBF00);
 		addMob(EntityPigeon.class, "entity_pigeon", 0xC8C9CD, 0x858894);
+		addMob(EntityScutterfish.class, "entity_scutterfish", 0xC8C9CD, 0x858894);
+
 		addMob(EntityFBI.class, "entity_ntm_fbi", 0x008000, 0x404040);
 		addMob(EntityFBIDrone.class, "entity_ntm_fbi_drone", 0x008000, 0x404040);
 		addMob(EntityRADBeast.class, "entity_ntm_radiation_blaze", 0x303030, 0x008000);
@@ -267,6 +275,10 @@ public class EntityMappings {
 		for(Quartet<Class<? extends Entity>, String, Integer, Integer> entry : mobMappings) {
 			EntityRegistry.registerGlobalEntityID(entry.getW(), entry.getX(), EntityRegistry.findGlobalUniqueEntityId(), entry.getY(), entry.getZ());
 		}
+		EntityRegistry.addSpawn(EntityDuck.class, 10, 4, 4, EnumCreatureType.creature, BiomeGenBase.swampland);
+		EntityRegistry.addSpawn(EntityDuck.class, 10, 4, 4, EnumCreatureType.creature, BiomeGenBase.river);
+		EntityRegistry.addSpawn(EntityDuck.class, 10, 4, 4, EnumCreatureType.creature, BiomeGenBase.forest);
+		
 	}
 	
 	private static void addEntity(Class<? extends Entity> clazz, String name, int trackingRange) {
@@ -286,6 +298,7 @@ public class EntityMappings {
 		for(BiomeGenBase biome : biomes) {
 			
 			if(biome == null) continue;
+			if(biome instanceof BiomeGenBaseCelestial) continue;
 			
 			List<SpawnListEntry> spawns = biome.getSpawnableList(typeOfCreature);
 

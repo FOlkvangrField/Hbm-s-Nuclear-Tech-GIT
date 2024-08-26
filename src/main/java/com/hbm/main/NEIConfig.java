@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class NEIConfig implements IConfigureNEI {
 	
@@ -80,6 +81,12 @@ public class NEIConfig implements IConfigureNEI {
 		API.hideItem(new ItemStack(ModBlocks.spotlight_fluoro_off));
 		API.hideItem(new ItemStack(ModBlocks.spotlight_halogen_off));
 		API.hideItem(new ItemStack(ModBlocks.spotlight_beam));
+
+		// Until we do the new BRO shit, hide it from NEI
+		API.hideItem(new ItemStack(ModItems.bedrock_ore, 1, OreDictionary.WILDCARD_VALUE));
+		API.hideItem(new ItemStack(ModItems.bedrock_ore_base));
+		API.hideItem(new ItemStack(ModItems.ore_density_scanner));
+		API.hideItem(new ItemStack(ModBlocks.machine_ore_slopper));
 		
 		API.registerHighlightIdentifier(ModBlocks.ore_random, new IHighlightHandler() {
 

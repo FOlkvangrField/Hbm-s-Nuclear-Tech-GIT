@@ -5,8 +5,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 import javax.annotation.Nonnegative;
 
@@ -66,6 +69,14 @@ public class BobMathUtil {
 			angle -= 180;
 		
 		return angle;
+	}
+
+	public static Vec3 getDirectionFromAxisAngle(float pitch, float yaw, double length) {
+		double ox = (double) (-MathHelper.sin(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI) * length);
+		double oz = (double) (MathHelper.cos(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI) * length);
+		double oy = (double) (-MathHelper.sin(pitch / 180.0F * (float) Math.PI) * length);
+
+		return Vec3.createVectorHelper(ox, oy, oz);
 	}
 
 	public static float remap(float num, float min1, float max1, float min2, float max2){
@@ -206,15 +217,20 @@ public class BobMathUtil {
 		double delta = (beta - alpha + 180) % 360 - 180;
 		return delta < -180 ? delta + 360 : delta;
 	}
-	
-	/** Soft peak sine */
-	public static double sps(double x) {
-		return Math.sin(Math.PI / 2D * Math.cos(x));
+
+	// I am sick of trying to remember the ridiculous quirks of Java 8
+	// so I wrote this thing that can shit any int-ish list-ish into a regular fucking int[]
+	public static int[] intCollectionToArray(Collection<Integer> in) {
+		return intCollectionToArray(in, i -> (int)i);
 	}
-	
-	/** Square wave sine, make sure squarination is [0;1] */
-	public static double sws(double x, double squarination) {
-		double s = Math.sin(x);
-		return Math.pow(Math.abs(s), 2 - squarination) / s;
+
+	public static int[] intCollectionToArray(Collection<Integer> in, ToIntFunction<? super Object> mapper) {
+		return Arrays.stream(in.toArray()).mapToInt(mapper).toArray();
 	}
+
+	public static int[] collectionToIntArray(Collection<? extends Object> in, ToIntFunction<? super Object> mapper) {
+		return Arrays.stream(in.toArray()).mapToInt(mapper).toArray();
+	}
+
+
 }

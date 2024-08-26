@@ -28,6 +28,7 @@ public class GeneralConfig {
 	public static boolean enableSilentCompStackErrors = true;
 	public static boolean enableSkyboxes = true;
 	public static boolean enableImpactWorldProvider = true;
+	public static boolean moreStars; //debugging
 	public static boolean enableStatReRegistering = true;
 	public static boolean enableKeybindOverlap = true;
 	public static boolean enableFluidContainerCompat = true;
@@ -66,7 +67,11 @@ public class GeneralConfig {
 	public static boolean enableLBSMSafeCrates = true;
 	public static boolean enableLBSMSafeMEDrives = true;
 	public static boolean enableLBSMIGen = true;
+	public static boolean enableLBSMNeutronDecon = true;
 	public static int schrabRate = 20;
+
+	public static boolean enableThreadedAtmospheres = true;
+	public static boolean enableSacrilege = false;
 	
 	public static void loadFromConfig(Configuration config) {
 
@@ -98,6 +103,7 @@ public class GeneralConfig {
 		hintPos = CommonConfig.createConfigInt(config, CATEGORY_GENERAL, "1.29_hudOverlayPosition", "0: Top left\n1: Top right\n2: Center right\n3: Center Left", 0);
 		enableSkyboxes = config.get(CATEGORY_GENERAL, "1.31_enableSkyboxes", true, "If enabled, will try to use NTM's custom skyboxes.").getBoolean(true);
 		enableImpactWorldProvider = config.get(CATEGORY_GENERAL, "1.32_enableImpactWorldProvider", true, "If enabled, registers custom world provider which modifies lighting and sky colors for post impact effects.").getBoolean(true);
+		moreStars = CommonConfig.createConfigBool(config, CATEGORY_GENERAL, "More_Stars","used for debugging",true);
 		enableStatReRegistering = config.get(CATEGORY_GENERAL, "1.33_enableStatReRegistering", true, "If enabled, will re-register item crafting/breaking/usage stats in order to fix a forge bug where modded items just won't show up.").getBoolean(true);
 		enableKeybindOverlap = config.get(CATEGORY_GENERAL, "1.34_enableKeybindOverlap", true, "If enabled, will handle keybinds that would otherwise be ignored due to overlapping.").getBoolean(true);
 		enableFluidContainerCompat = config.get(CATEGORY_GENERAL, "1.35_enableFluidContainerCompat", true, "If enabled, fluid containers will be oredicted and interchangable in recipes with other mods' containers, as well as TrainCraft's diesel being considered a valid diesel canister.").getBoolean(true);
@@ -109,6 +115,8 @@ public class GeneralConfig {
 		normalSoundChannels = CommonConfig.createConfigInt(config, CATEGORY_GENERAL, "1.41_normalSoundChannels",
 				"The amount of channels to create while 1.39_enableSoundExtension is enabled.\n" +
 				"Note that a value below 28 or above 200 can cause buggy sounds and issues with other mods running out of sound memory.", 100);
+		enableThreadedAtmospheres = CommonConfig.createConfigBool(config, CATEGORY_GENERAL, "1.42_threadedAtmospheres", "If enabled, will run atmosphere blobbing in a separate thread for performance", true);
+		enableSacrilege = CommonConfig.createConfigBool(config, CATEGORY_GENERAL, "1.43_serverSafety", "Allows for automated entity culling to function properly.", false);
 
 		enableExpensiveMode = config.get(CATEGORY_GENERAL, "1.99_enableExpensiveMode", false, "It does what the name implies.").getBoolean(false);
 		
@@ -152,7 +160,9 @@ public class GeneralConfig {
 		enableLBSMSafeCrates = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_safeCrates", "When enabled, prevents crates from becoming radioactive", true);
 		enableLBSMSafeMEDrives = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_safeMEDrives", "When enabled, prevents ME Drives and Portable Cells from becoming radioactive", true);
 		enableLBSMIGen = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_iGen", "When enabled, restores the industrial generator to pre-nerf power", true);
+		enableLBSMNeutronDecon = CommonConfig.createConfigBool(config, CATEGORY_LBSM, "LBSM_NeuCon", "When enabled, Player Decontaminators can decontaminate radioactive items stemmed from neutron rads.", true);
 		schrabRate = CommonConfig.createConfigInt(config, CATEGORY_LBSM, "LBSM_schrabOreRate", "Changes the amount of uranium ore needed on average to create one schrabidium ore using nukes. Standard mode value is 100", 20);
+		
 		
 		if(enable528) enableLBSM = false;
 	}

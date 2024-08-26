@@ -64,7 +64,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		ItemCustomMissilePart fuselage = (ItemCustomMissilePart) template.fuselage;
 		ItemCustomMissilePart thruster = (ItemCustomMissilePart) template.thruster;
 
-		this.fuel = (Float) fuselage.attributes[1];
+		this.fuel = (float) fuselage.getTankSize();
 		this.consumption = (Float) thruster.attributes[1];
 
 		this.setSize(1.5F, 1.5F);
@@ -140,6 +140,8 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		case KEROSENE: smoke = "exKerosene"; break;
 		case SOLID: smoke = "exSolid"; break;
 		case XENON: break;
+		case HYDRAZINE: smoke = "exKerosene"; break;
+		case METHALOX: smoke = "exKerosene"; break;
 		}
 
 		if(!smoke.isEmpty()) for(int i = 0; i < velocity; i++) MainRegistry.proxy.spawnParticle(posX - v.xCoord * i, posY - v.yCoord * i, posZ - v.zCoord * i, smoke, null);
