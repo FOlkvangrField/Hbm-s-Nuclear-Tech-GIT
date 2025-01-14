@@ -33,6 +33,9 @@ public class GasCentrifugeRecipes {
 		public static PseudoFluidType MUD_HEAVY	= new PseudoFluidType("MUD_HEAVY",	500,	0,		NONE,		false,	new ItemStack(ModItems.powder_iron, 1), new ItemStack(ModItems.dust, 1), new ItemStack(ModItems.nuclear_waste_tiny, 1));
 		public static PseudoFluidType MUD		= new PseudoFluidType("MUD", 		1000,	500,	MUD_HEAVY,	false,	new ItemStack(ModItems.powder_lead, 1), new ItemStack(ModItems.dust, 1));
 		
+		public static PseudoFluidType MINSOLEE =	new PseudoFluidType ("NONETWO", 1000, 0,		NONE,		false,	new ItemStack(ModItems.crystal_cleaned, 1));
+		public static PseudoFluidType MINSOLE	=	new PseudoFluidType ("MINSOL", 1000, 1000,	MINSOLEE,	false,	new ItemStack(ModItems.powder_iron, 1));
+
 		public String name;
 		int fluidConsumed;
 		int fluidProduced;
@@ -99,5 +102,8 @@ public class GasCentrifugeRecipes {
 		gasCent.put(new FluidStack(1200, Fluids.UF6), new Object[] { new ItemStack[] {new ItemStack(ModItems.nugget_u238, 6), new ItemStack(ModItems.nugget_uranium_fuel, 6), new ItemStack(ModItems.fluorite, 4)}, false, 2 });
 		gasCent.put(new FluidStack(900, Fluids.PUF6), new Object[] { new ItemStack[] {new ItemStack(ModItems.nugget_pu238, 3), new ItemStack(ModItems.nugget_pu_mix, 6), new ItemStack(ModItems.fluorite, 3)}, false, 1 });
 		gasCent.put(new FluidStack(1000, Fluids.WATZ), new Object[] { new ItemStack[] {new ItemStack(ModItems.powder_iron, 1), new ItemStack(ModItems.powder_lead, 1), new ItemStack(ModItems.nuclear_waste_tiny, 1), new ItemStack(ModItems.dust, 2)}, false, 2 });
+		
+				gasCent.put(new FluidStack(1000, Fluids.MINSOL), new Object[] { new ItemStack[] 
+				{new ItemStack(ModItems.powder_iron, 1), new ItemStack(ModItems.crystal_cleaned, 1),}, false, 2 });
 	}
 }

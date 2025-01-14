@@ -8,13 +8,12 @@ import com.hbm.items.weapon.ItemCustomMissilePart;
 import com.hbm.items.weapon.ItemCustomMissilePart.FuelType;
 import com.hbm.items.weapon.ItemCustomMissilePart.PartType;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.TEMissileMultipartPacket;
+import com.hbm.packet.toclient.TEMissileMultipartPacket;
 import com.hbm.tileentity.IGUIProvider;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ISidedInventory;
@@ -84,7 +83,7 @@ public class TileEntityMachineMissileAssembly extends TileEntity implements ISid
 
 	@Override
 	public int getInventoryStackLimit() {
-		return 64;
+		return 1;
 	}
 
 	@Override
@@ -225,7 +224,7 @@ public class TileEntityMachineMissileAssembly extends TileEntity implements ISid
 			ItemCustomMissilePart thruster = (ItemCustomMissilePart)slots[4].getItem();
 
 			if(part.type == PartType.WARHEAD && fuselage.type == PartType.FUSELAGE && thruster.type == PartType.THRUSTER) {
-				float weight = (Float)part.attributes[2];
+				float weight = (float)part.mass * 0.001F;
 				float thrust = (Float)thruster.attributes[2];
 				
 				if(part.bottom == fuselage.top && weight <= thrust)
@@ -317,7 +316,7 @@ public class TileEntityMachineMissileAssembly extends TileEntity implements ISid
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMachineMissileAssembly(player.inventory, this);
 	}
 }

@@ -30,8 +30,8 @@ import net.minecraft.world.World;
 
 public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLoader {
 
-	protected float fuel;
-	protected float consumption;
+	public float fuel;
+	public float consumption;
 
 	public EntityMissileCustom(World world) {
 		super(world);
@@ -64,7 +64,7 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		ItemCustomMissilePart fuselage = (ItemCustomMissilePart) template.fuselage;
 		ItemCustomMissilePart thruster = (ItemCustomMissilePart) template.thruster;
 
-		this.fuel = (Float) fuselage.attributes[1];
+		this.fuel = (float) fuselage.getTankSize();
 		this.consumption = (Float) thruster.attributes[1];
 
 		this.setSize(1.5F, 1.5F);
@@ -81,6 +81,12 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 	
 	@Override
 	public void onUpdate() {
+
+		ItemCustomMissilePart part = (ItemCustomMissilePart) Item.getItemById(this.dataWatcher.getWatchableObjectInt(9));
+		WarheadType type = (WarheadType) part.attributes[0];
+		if(type != null && type.updateCustom != null) {
+			type.updateCustom.accept(this);
+		}
 		
 		if(!worldObj.isRemote) {
 			if(this.hasPropulsion()) this.fuel -= this.consumption;
@@ -140,6 +146,8 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 		case KEROSENE: smoke = "exKerosene"; break;
 		case SOLID: smoke = "exSolid"; break;
 		case XENON: break;
+		case HYDRAZINE: smoke = "exKerosene"; break;
+		case METHALOX: smoke = "exKerosene"; break;
 		}
 
 		if(!smoke.isEmpty()) for(int i = 0; i < velocity; i++) MainRegistry.proxy.spawnParticle(posX - v.xCoord * i, posY - v.yCoord * i, posZ - v.zCoord * i, smoke, null);
@@ -152,6 +160,11 @@ public class EntityMissileCustom extends EntityMissileBaseNT implements IChunkLo
 
 		WarheadType type = (WarheadType) part.attributes[0];
 		float strength = (Float) part.attributes[1];
+		
+		if(type.impactCustom != null) {
+			type.impactCustom.accept(this);
+			return;
+		}
 
 		switch(type) {
 		case HE:

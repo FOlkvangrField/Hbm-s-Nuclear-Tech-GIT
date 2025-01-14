@@ -17,7 +17,6 @@ import com.hbm.util.I18nUtil;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -61,7 +60,7 @@ public class TileEntityFurnaceIron extends TileEntityMachineBase implements IGUI
 	public void updateEntity() {
 		
 		if(!worldObj.isRemote) {
-			
+
 			UpgradeManager.eval(slots, 4, 4);
 			this.processingTime = baseTime - ((baseTime / 2) * Math.min(UpgradeManager.getLevel(UpgradeType.SPEED), 3) / 3);
 			
@@ -88,7 +87,7 @@ public class TileEntityFurnaceIron extends TileEntityMachineBase implements IGUI
 				} 
 			}
 			
-			if(canSmelt()) {
+			if(canSmelt() && breatheAir(worldObj.getTotalWorldTime() % 5 == 0 ? 1 : 0)) {
 				wasOn = true;
 				this.progress++;
 				this.burnTime--;
@@ -214,7 +213,7 @@ public class TileEntityFurnaceIron extends TileEntityMachineBase implements IGUI
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIFurnaceIron(player.inventory, this);
 	}
 	

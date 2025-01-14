@@ -12,8 +12,8 @@ import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.items.ModItems;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.util.BobMathUtil;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
@@ -109,7 +109,20 @@ public class GunNPCFactory {
 		
 		return bullet;
 	}
-	
+	public static BulletConfiguration getBehemothBullet() {
+		
+		BulletConfiguration bullet = BulletConfigFactory.standardBulletConfig();
+		
+		bullet.ammo = new ComparableStack(ModItems.coin_maskman);
+		bullet.spread = 0.0F;
+		bullet.dmgMin = 5;
+		bullet.dmgMax = 10;
+		bullet.wear = 10;
+		bullet.leadChance = 15;
+		bullet.style = BulletConfiguration.STYLE_WAR;
+		
+		return bullet;
+	}
 	public static BulletConfiguration getMaskmanTracer() {
 		
 		BulletConfiguration bullet = BulletConfigFactory.standardBulletConfig();

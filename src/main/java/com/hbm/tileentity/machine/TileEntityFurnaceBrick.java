@@ -14,7 +14,6 @@ import com.hbm.tileentity.TileEntityMachineBase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -67,6 +66,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 		
 		if(!worldObj.isRemote) {
 			boolean wasBurning = this.burnTime > 0;
+			boolean canOperate = breatheAir(wasBurning && worldObj.getTotalWorldTime() % 5 == 0 ? 1 : 0);
 			boolean markDirty = false;
 	
 			if(this.burnTime > 0) {
@@ -74,7 +74,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 			}
 	
 			if(this.burnTime != 0 || this.slots[1] != null && this.slots[0] != null) {
-				if(this.burnTime == 0 && this.canSmelt()) {
+				if(canOperate && this.burnTime == 0 && this.canSmelt()) {
 					this.maxBurnTime = this.burnTime = TileEntityFurnace.getItemBurnTime(this.slots[1]);
 
 					if(this.burnTime > 0) {
@@ -99,7 +99,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 					}
 				}
 
-				if(this.burnTime > 0 && this.canSmelt()) {
+				if(canOperate && this.burnTime > 0 && this.canSmelt()) {
 					this.progress += this.getBurnSpeed();
 
 					if(this.progress >= 200) {
@@ -228,7 +228,7 @@ public class TileEntityFurnaceBrick extends TileEntityMachineBase implements IGU
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIFurnaceBrick(player.inventory, this);
 	}
 }

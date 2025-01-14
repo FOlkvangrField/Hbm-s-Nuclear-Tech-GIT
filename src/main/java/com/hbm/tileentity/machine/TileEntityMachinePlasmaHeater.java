@@ -6,12 +6,14 @@ import java.util.List;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineITER;
+import com.hbm.blocks.machine.MachineHTRF4;
 import com.hbm.inventory.container.ContainerPlasmaHeater;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.gui.GUIPlasmaHeater;
 import com.hbm.lib.Library;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
 
@@ -19,7 +21,6 @@ import api.hbm.energymk2.IEnergyReceiverMK2;
 import api.hbm.fluid.IFluidStandardReceiver;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,7 +29,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IGUIProvider {
+public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardReceiver, IGUIProvider, IFluidCopiable {
 	
 	public long power;
 	public static final long maxPower = 100000000;
@@ -90,6 +91,31 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 			ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata() - BlockDummyable.offset).getOpposite();
 			int dist = 11;
 			
+			if(worldObj.getBlock(xCoord + dir.offsetX * dist, yCoord + 1, zCoord + dir.offsetZ * dist) == ModBlocks.machine_htrf4) {
+				int[] pos = ((MachineHTRF4)ModBlocks.machine_htrf4).findCore(worldObj, xCoord + dir.offsetX * dist, yCoord + 1, zCoord + dir.offsetZ * dist);
+				
+				if(pos != null) {
+					TileEntity te = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
+					
+					if(te instanceof TileEntityMachineHTRF4) {
+						TileEntityMachineHTRF4 htrf = (TileEntityMachineHTRF4)te;
+							
+						if(this.plasma.getTankType() != Fluids.NONE) {
+							htrf.tanks[0].setTankType(this.plasma.getTankType());
+						}
+
+						if(htrf.tanks[0].getTankType() == this.plasma.getTankType()) {
+							int toLoad = Math.min(htrf.tanks[0].getMaxFill() - htrf.tanks[0].getFill(), this.plasma.getFill());
+							toLoad = Math.min(toLoad, 200);
+							this.plasma.setFill(this.plasma.getFill() - toLoad);
+							htrf.tanks[0].setFill(htrf.tanks[0].getFill() + toLoad);
+							this.markDirty();
+							htrf.markDirty();
+						}
+					}
+				}
+			}
+			
 			if(worldObj.getBlock(xCoord + dir.offsetX * dist, yCoord + 2, zCoord + dir.offsetZ * dist) == ModBlocks.iter) {
 				int[] pos = ((MachineITER)ModBlocks.iter).findCore(worldObj, xCoord + dir.offsetX * dist, yCoord + 2, zCoord + dir.offsetZ * dist);
 				
@@ -103,7 +129,7 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 							iter.plasma.setTankType(this.plasma.getTankType());
 						}
 							
-							if(iter.isOn) {
+						if(iter.isOn) {
 							
 							if(iter.plasma.getTankType() == this.plasma.getTankType()) {
 								
@@ -257,7 +283,7 @@ public class TileEntityMachinePlasmaHeater extends TileEntityMachineBase impleme
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIPlasmaHeater(player.inventory, this);
 	}
 }

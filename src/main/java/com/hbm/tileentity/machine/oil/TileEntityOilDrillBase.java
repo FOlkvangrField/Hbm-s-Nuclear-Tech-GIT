@@ -9,11 +9,7 @@ import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.Library;
-import com.hbm.tileentity.IConfigurableMachine;
-import com.hbm.tileentity.IGUIProvider;
-import com.hbm.tileentity.IPersistentNBT;
-import com.hbm.tileentity.IUpgradeInfoProvider;
-import com.hbm.tileentity.TileEntityMachineBase;
+import com.hbm.tileentity.*;
 import com.hbm.util.BobMathUtil;
 import com.hbm.util.Tuple;
 import com.hbm.util.Tuple.Triplet;
@@ -30,7 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class TileEntityOilDrillBase extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IConfigurableMachine, IPersistentNBT, IGUIProvider, IUpgradeInfoProvider {
+public abstract class TileEntityOilDrillBase extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IConfigurableMachine, IPersistentNBT, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
 
 	public int indicator = 0;
 	
@@ -227,7 +223,7 @@ public abstract class TileEntityOilDrillBase extends TileEntityMachineBase imple
 	}
 	
 	public boolean canSuckBlock(Block b) {
-		return b == ModBlocks.ore_oil || b == ModBlocks.ore_oil_empty;
+		return b == ModBlocks.ore_oil || b == ModBlocks.ore_oil_empty || b == ModBlocks.ore_gas || b == ModBlocks.ore_gas_empty;
 	}
 	
 	protected HashSet<Tuple.Triplet<Integer, Integer, Integer>> trace = new HashSet();
@@ -246,12 +242,12 @@ public abstract class TileEntityOilDrillBase extends TileEntityMachineBase imple
 		
 		Block b = worldObj.getBlock(x, y, z);
 		
-		if(b == ModBlocks.ore_oil || b == ModBlocks.ore_bedrock_oil) {
+		if(b == ModBlocks.ore_oil || b == ModBlocks.ore_bedrock_oil || b == ModBlocks.ore_gas) {
 			doSuck(x, y, z);
 			return true;
 		}
 		
-		if(b == ModBlocks.ore_oil_empty) {
+		if(b == ModBlocks.ore_oil_empty || b == ModBlocks.ore_gas_empty) {
 			ForgeDirection[] dirs = BobMathUtil.getShuffledDirs();
 			
 			for(ForgeDirection dir : dirs) {
@@ -264,8 +260,9 @@ public abstract class TileEntityOilDrillBase extends TileEntityMachineBase imple
 	}
 	
 	public void doSuck(int x, int y, int z) {
+		Block b = worldObj.getBlock(x, y, z);
 		
-		if(worldObj.getBlock(x, y, z) == ModBlocks.ore_oil) {
+		if(b == ModBlocks.ore_oil || b == ModBlocks.ore_gas) {
 			onSuck(x, y, z);
 		}
 	}
@@ -328,5 +325,10 @@ public abstract class TileEntityOilDrillBase extends TileEntityMachineBase imple
 		if(type == UpgradeType.AFTERBURN) return 3;
 		if(type == UpgradeType.OVERDRIVE) return 3;
 		return 0;
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return null;
 	}
 }

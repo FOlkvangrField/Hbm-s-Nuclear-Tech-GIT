@@ -7,6 +7,7 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FluidTrait.FluidReleaseType;
 import com.hbm.inventory.gui.GUICombustionEngine;
 import com.hbm.items.ModItems;
@@ -14,6 +15,7 @@ import com.hbm.items.machine.ItemPistons.EnumPistonType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.sound.AudioWrapper;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachinePolluting;
 import com.hbm.util.EnumUtil;
@@ -23,7 +25,6 @@ import api.hbm.energymk2.IEnergyProviderMK2;
 import api.hbm.fluid.IFluidStandardTransceiver;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,7 +33,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineCombustionEngine extends TileEntityMachinePolluting implements IEnergyProviderMK2, IFluidStandardTransceiver, IControlReceiver, IGUIProvider {
+public class TileEntityMachineCombustionEngine extends TileEntityMachinePolluting implements IEnergyProviderMK2, IFluidStandardTransceiver, IControlReceiver, IGUIProvider, IFluidCopiable {
 	
 	public boolean isOn = false;
 	public static long maxPower = 2_500_000;
@@ -63,7 +64,6 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 	public void updateEntity() {
 		
 		if(!worldObj.isRemote) {
-
 			this.tank.loadTank(0, 1, slots);
 			if(this.tank.setType(4, slots)) {
 				this.tenth = 0;
@@ -79,22 +79,24 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 				double eff = piston.eff[trait.getGrade().ordinal()];
 				
 				if(eff > 0) {
-					int speed = setting * 2;
-					
-					int toBurn = Math.min(fill, speed);
-					this.power += toBurn * (trait.getCombustionEnergy() / 10_000D) * eff;
-					fill -= toBurn;
-
-					if(worldObj.getTotalWorldTime() % 5 == 0 && toBurn > 0) {
-						super.pollute(tank.getTankType(), FluidReleaseType.BURN, toBurn * 0.5F);
+					if(breatheAir(worldObj.getTotalWorldTime() % 5 == 0 ? setting : 0)) {
+						int speed = setting * 2;
+						
+						int toBurn = Math.min(fill, speed);
+						this.power += toBurn * (trait.getCombustionEnergy() / 10_000D) * eff;
+						fill -= toBurn;
+	
+						if(worldObj.getTotalWorldTime() % 5 == 0 && toBurn > 0) {
+							super.pollute(tank.getTankType(), FluidReleaseType.BURN, toBurn * 0.5F);
+						}
+						
+						if(toBurn > 0) {
+							wasOn = true;
+						}
+						
+						tank.setFill(fill / 10);
+						tenth = fill % 10;
 					}
-					
-					if(toBurn > 0) {
-						wasOn = true;
-					}
-					
-					tank.setFill(fill / 10);
-					tenth = fill % 10;
 				}
 			}
 			
@@ -165,6 +167,7 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 		};
 	}
 	
+	@Override
 	public AudioWrapper createAudioLoop() {
 		return MainRegistry.proxy.getLoopedSound("hbm:block.igeneratorOperate", xCoord, yCoord, zCoord, 1.0F, 10F, 1.0F, 20);
 	}
@@ -180,7 +183,6 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 
 	@Override
 	public void invalidate() {
-
 		super.invalidate();
 
 		if(audio != null) {
@@ -262,7 +264,7 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUICombustionEngine(player.inventory, this);
 	}
 
@@ -317,5 +319,22 @@ public class TileEntityMachineCombustionEngine extends TileEntityMachinePollutin
 		if(data.hasKey("setting")) this.setting = data.getInteger("setting");
 		
 		this.markChanged();
+	}
+
+	@Override
+	public NBTTagCompound getSettings(World world, int x, int y, int z) {
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setIntArray("fluidID", new int[]{tank.getTankType().getID()});
+		tag.setBoolean("isOn", isOn);
+		tag.setInteger("burnRate", setting);
+		return tag;
+	}
+
+	@Override
+	public void pasteSettings(NBTTagCompound nbt, int index, World world, EntityPlayer player, int x, int y, int z) {
+		int id = nbt.getIntArray("fluidID")[index];
+		tank.setTankType(Fluids.fromID(id));
+		if(nbt.hasKey("isOn")) isOn = nbt.getBoolean("isOn");
+		if(nbt.hasKey("burnRate")) setting = nbt.getInteger("burnRate");
 	}
 }

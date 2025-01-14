@@ -57,14 +57,14 @@ public class CompatHandler {
      */
     public static FluidType intToSteamType(int arg) {
         switch(arg) {
-            default:
-                return Fluids.STEAM;
             case(1):
                 return Fluids.HOTSTEAM;
             case(2):
                 return Fluids.SUPERHOTSTEAM;
             case(3):
                 return Fluids.ULTRAHOTSTEAM;
+            default:
+                return Fluids.STEAM;
         }
     }
 

@@ -3,6 +3,7 @@ package com.hbm.tileentity.machine;
 import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.dim.CelestialBody;
 import com.hbm.inventory.UpgradeManager;
 import com.hbm.inventory.container.ContainerOreSlopper;
 import com.hbm.inventory.fluid.FluidType;
@@ -14,12 +15,14 @@ import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.items.special.ItemBedrockOreBase;
 import com.hbm.items.special.ItemBedrockOreNew;
 import com.hbm.items.special.ItemBedrockOreNew.BedrockOreGrade;
-import com.hbm.items.special.ItemBedrockOreNew.BedrockOreType;
+import com.hbm.items.special.ItemBedrockOreNew.CelestialBedrockOre;
+import com.hbm.items.special.ItemBedrockOreNew.CelestialBedrockOreType;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.AuxParticlePacketNT;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.tileentity.IFluidCopiable;
+import com.hbm.packet.toclient.AuxParticlePacketNT;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.IUpgradeInfoProvider;
 import com.hbm.tileentity.TileEntityMachineBase;
@@ -33,7 +36,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,7 +48,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityMachineOreSlopper extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IGUIProvider, IUpgradeInfoProvider {
+public class TileEntityMachineOreSlopper extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IGUIProvider, IUpgradeInfoProvider, IFluidCopiable {
 	
 	public long power;
 	public static final long maxPower = 100_000;
@@ -71,7 +73,8 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 	public int delay;
 	
 	public FluidTank[] tanks;
-	public double[] ores = new double[BedrockOreType.values().length];
+	public double[] ores = new double[CelestialBedrockOre.getAllTypes().size()];
+	private CelestialBody fromBody;
 
 	public TileEntityMachineOreSlopper() {
 		super(11);
@@ -125,9 +128,12 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 				while(progress >= 1F && canSlop()) {
 					progress -= 1F;
 					
-					for(BedrockOreType type : BedrockOreType.values()) {
-						ores[type.ordinal()] += (ItemBedrockOreBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
+					fromBody = ItemBedrockOreBase.getOreBody(slots[2]);
+
+					for(CelestialBedrockOreType type : CelestialBedrockOre.get(fromBody.getEnum()).types) {
+						ores[type.index] += (ItemBedrockOreBase.getOreAmount(slots[2], type) * (1D + efficiency * 0.1));
 					}
+
 					
 					this.decrStackSize(2, 1);
 					this.tanks[0].setFill(this.tanks[0].getFill() - waterUsed);
@@ -157,14 +163,14 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 				this.progress = 0;
 			}
 
-			for(BedrockOreType type : BedrockOreType.values()) {
+			for(CelestialBedrockOreType type : CelestialBedrockOre.getAllTypes()) {
 				ItemStack output = ItemBedrockOreNew.make(BedrockOreGrade.BASE, type);
-				outer: while(ores[type.ordinal()] >= 1) {
+				outer: while(ores[type.index] >= 1) {
 					for(int i = 3; i <= 8; i++) if(slots[i] != null && slots[i].getItem() == output.getItem() && slots[i].getItemDamage() == output.getItemDamage() && slots[i].stackSize < output.getMaxStackSize()) {
-						slots[i].stackSize++; ores[type.ordinal()] -= 1F; continue outer;
+						slots[i].stackSize++; ores[type.index] -= 1F; continue outer;
 					}
 					for(int i = 3; i <= 8; i++) if(slots[i] == null) {
-						slots[i] = output; ores[type.ordinal()] -= 1F; continue outer;
+						slots[i] = output; ores[type.index] -= 1F; continue outer;
 					}
 					break outer;
 				}
@@ -376,7 +382,7 @@ public class TileEntityMachineOreSlopper extends TileEntityMachineBase implement
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIOreSlopper(player.inventory, this);
 	}
 

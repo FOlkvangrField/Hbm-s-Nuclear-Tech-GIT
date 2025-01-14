@@ -8,7 +8,6 @@ import com.hbm.blocks.generic.BlockBobble.TileEntityBobble;
 import com.hbm.items.ModItems;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.ResourceManager;
-import com.hbm.render.model.ModelUboinik;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,6 +46,9 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 	public static final ResourceLocation bobble_nos = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/nos.png");
 	public static final ResourceLocation bobble_drillgon = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/drillgon200.png");
 	public static final ResourceLocation bobble_cirno = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/cirno.png");
+	public static final ResourceLocation bobble_gwen = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/gwen.png");
+	public static final ResourceLocation bobble_juice = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/Juicy_Lad.png");
+	public static final ResourceLocation bobble_jamesh_2= new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/JamesH_2.png");	
 	public static final ResourceLocation bobble_microwave = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/microwave.png");
 	public static final ResourceLocation bobble_peep = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/peep.png");
 	public static final ResourceLocation bobble_mellow = new ResourceLocation(RefStrings.MODID, "textures/models/trinkets/mellowrpg8.png");
@@ -99,6 +101,9 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 		case VAER:		bindTexture(bobble_vaer); break;
 		case NOS:		bindTexture(bobble_nos); break;
 		case DRILLGON:	bindTexture(bobble_drillgon); break;
+		case GWEN:		bindTexture(bobble_gwen); break;
+		case JUICE:		bindTexture(bobble_juice); break;
+		case JAMESH_2:	bindTexture(bobble_jamesh_2); break;
 		case MICROWAVE:	bindTexture(bobble_microwave); break;
 		case PEEP:		bindTexture(bobble_peep); break;
 		case MELLOW:	bindTexture(bobble_mellow); break;
@@ -380,7 +385,6 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 		bobble.renderPart("Drillgon");
 	}
 
-	private ModelUboinik shotgun = new ModelUboinik();
 	private ResourceLocation shot_tex = new ResourceLocation(RefStrings.MODID +":textures/models/ModelUboinik.png");
 	
 	/*
@@ -451,7 +455,7 @@ public class RenderBobble extends TileEntitySpecialRenderer {
 			GL11.glRotated(-60, 0, 1, 0);
 			GL11.glTranslated(-0.2, 0, 0);
 			GL11.glScaled(0.5, 0.5, 0.5);
-			shotgun.renderDud(0.0625F);
+			//shotgun.renderDud(0.0625F);
 			break;
 		case MELLOW:
 			GL11.glEnable(GL11.GL_BLEND);

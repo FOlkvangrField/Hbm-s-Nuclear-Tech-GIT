@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.dim.SolarSystem;
 import com.hbm.inventory.UpgradeManager;
 import com.hbm.inventory.container.ContainerMiningLaser;
 import com.hbm.inventory.fluid.Fluids;
@@ -32,7 +33,6 @@ import api.hbm.fluid.IFluidStandardSender;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -355,7 +355,11 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 			
 			if(item.getEntityItem().getItem() == Item.getItemFromBlock(ModBlocks.ore_oil)) {
 				
-				tank.setTankType(Fluids.OIL); //just to be sure
+				if(item.getEntityItem().getItemDamage() == SolarSystem.Body.LAYTHE.ordinal()) {
+					tank.setTankType(Fluids.OIL_DS);
+				} else {
+					tank.setTankType(Fluids.OIL); // now it seems we must be sure
+				}
 				
 				tank.setFill(tank.getFill() + 500);
 				if(tank.getFill() > tank.getMaxFill())
@@ -364,6 +368,19 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 				item.setDead();
 				continue;
 			}
+			
+			if(item.getEntityItem().getItem() == Item.getItemFromBlock(ModBlocks.ore_gas)) {
+				
+				tank.setTankType(Fluids.GAS); // because the tank can change forever more
+				
+				tank.setFill(tank.getFill() + 500);
+				if(tank.getFill() > tank.getMaxFill())
+					tank.setFill(tank.getMaxFill());
+				
+				item.setDead();
+				continue;
+			}
+			
 			
 			ItemStack stack = InventoryUtil.tryAddItemToInventory(slots, 9, 29, item.getEntityItem().copy());
 			
@@ -604,7 +621,7 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		
+		this.power = nbt.getLong("power");
 		tank.readFromNBT(nbt, "oil");
 		isOn = nbt.getBoolean("isOn");
 	}
@@ -612,7 +629,7 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		
+		nbt.setLong("power", power);
 		tank.writeToNBT(nbt, "oil");
 		nbt.setBoolean("isOn", isOn);
 	}
@@ -644,7 +661,7 @@ public class TileEntityMachineMiningLaser extends TileEntityMachineBase implemen
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public GuiScreen provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object provideGUI(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		return new GUIMiningLaser(player.inventory, this);
 	}
 

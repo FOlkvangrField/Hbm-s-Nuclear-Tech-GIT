@@ -2,6 +2,7 @@ package com.hbm.tileentity.machine;
 
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTank;
+import com.hbm.tileentity.IFluidCopiable;
 import com.hbm.tileentity.TileEntityMachineBase;
 
 import api.hbm.energymk2.IEnergyReceiverMK2;
@@ -9,7 +10,7 @@ import api.hbm.fluid.IFluidStandardTransceiver;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityDeuteriumExtractor extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver {
+public class TileEntityDeuteriumExtractor extends TileEntityMachineBase implements IEnergyReceiverMK2, IFluidStandardTransceiver, IFluidCopiable {
 	
 	public long power = 0;
 	public FluidTank[] tanks;
@@ -33,13 +34,13 @@ public class TileEntityDeuteriumExtractor extends TileEntityMachineBase implemen
 			
 			this.updateConnections();
 			
-			if(hasPower() && hasEnoughWater() && tanks[1].getMaxFill() > tanks[1].getFill()) {
+			if(hasPower()&& this.power > 200 && hasEnoughWater() && tanks[1].getMaxFill() > tanks[1].getFill()) {
 				int convert = Math.min(tanks[1].getMaxFill(), tanks[0].getFill()) / 50;
 				convert = Math.min(convert, tanks[1].getMaxFill() - tanks[1].getFill());
 				
 				tanks[0].setFill(tanks[0].getFill() - convert * 50); //dividing first, then multiplying, will remove any rounding issues
 				tanks[1].setFill(tanks[1].getFill() + convert);
-				power -= this.getMaxPower() / 20;
+				power -= this.getMaxPower() / 100;
 			}
 			
 			this.subscribeToAllAround(tanks[0].getTankType(), this);
@@ -69,7 +70,7 @@ public class TileEntityDeuteriumExtractor extends TileEntityMachineBase implemen
 	}
 
 	public boolean hasPower() {
-		return power >= this.getMaxPower() / 20;
+		return power >= this.getMaxPower() / 100;
 	}
 
 	public boolean hasEnoughWater() {
@@ -120,5 +121,10 @@ public class TileEntityDeuteriumExtractor extends TileEntityMachineBase implemen
 	@Override
 	public FluidTank[] getAllTanks() {
 		return tanks;
+	}
+
+	@Override
+	public FluidTank getTankToPaste() {
+		return null;
 	}
 }

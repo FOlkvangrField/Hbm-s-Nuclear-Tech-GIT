@@ -47,7 +47,7 @@ public class ItemEnums {
 	public static enum EnumPlantType {
 		TOBACCO,
 		ROPE,
-		MUSTARDWILLOW
+		MUSTARDWILLOW,
 	}
 
 	public static enum EnumChunkType {
@@ -77,6 +77,10 @@ public class ItemEnums {
 	}
 
 	public static enum EnumSecretType {
-		CANISTER, CONTROLLER
+		CANISTER, CONTROLLER, SELENIUM_STEEL
+	}
+
+	public static enum EnumCasingType {
+		SMALL, LARGE, SMALL_STEEL, LARGE_STEEL, SHOTSHELL, BUCKSHOT, BUCKSHOT_ADVANCED
 	}
 }

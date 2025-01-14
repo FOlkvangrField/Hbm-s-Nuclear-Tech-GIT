@@ -10,7 +10,7 @@ import codechicken.nei.recipe.TemplateRecipeHandler;
 
 public class NEIRegistry {
 
-	public static List<TemplateRecipeHandler> handlers = new ArrayList();
+	public static List<TemplateRecipeHandler> handlers = new ArrayList<>();
 	
 	public static List<TemplateRecipeHandler> listAllHandlers() {
 		
@@ -29,6 +29,8 @@ public class NEIRegistry {
 		handlers.add(new RefineryRecipeHandler());
 		handlers.add(new VacuumRecipeHandler());
 		handlers.add(new CrackingHandler());
+		handlers.add(new AlkylationHandler());
+		handlers.add(new CryoHandler());
 		handlers.add(new RadiolysisRecipeHandler());
 		handlers.add(new ReformingHandler());
 		handlers.add(new HydrotreatingHandler());
@@ -44,6 +46,7 @@ public class NEIRegistry {
 		handlers.add(new CrucibleCastingHandler());
 		handlers.add(new ToolingHandler());
 		handlers.add(new ConstructionHandler());
+		handlers.add(new DairyHandler());
 
 		//universal boyes
 		handlers.add(new ZirnoxRecipeHandler());
@@ -51,6 +54,7 @@ public class NEIRegistry {
 		handlers.add(new LiquefactionHandler());
 		handlers.add(new SolidificationHandler());
 		handlers.add(new CokingHandler());
+		handlers.add(new PyroHandler());
 		handlers.add(new FractioningHandler());
 		handlers.add(new BoilingHandler());
 		handlers.add(new CombinationHandler());
@@ -62,9 +66,12 @@ public class NEIRegistry {
 		handlers.add(new AshpitHandler());
 		handlers.add(new ArcWelderHandler());
 		handlers.add(new SolderingStationHandler());
+		handlers.add(new VacuumCircuitHandler());
 		handlers.add(new ExposureChamberHandler());
 		handlers.add(new ArcFurnaceSolidHandler());
 		handlers.add(new ArcFurnaceFluidHandler());
+		handlers.add(new RotaryFurnaceHandler());
+		handlers.add(new AmmoPressHandler());
 
 		//this shit comes last
 		handlers.add(new FluidRecipeHandler());

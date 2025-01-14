@@ -8,7 +8,7 @@ import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.trait.*;
-import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Gaseous;
+import com.hbm.inventory.fluid.trait.FT_Gaseous;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Gaseous_ART;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Liquid;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Viscous;
@@ -66,7 +66,6 @@ public class EntityMist extends Entity {
 	public FluidType getType() {
 		return Fluids.fromID(this.dataWatcher.getWatchableObjectInt(10));
 	}
-	
 
 	@Override
 	public void onEntityUpdate() {

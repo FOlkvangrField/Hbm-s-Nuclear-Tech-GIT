@@ -6,11 +6,12 @@ import java.util.Set;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.generic.BlockDoorGeneric;
+import com.hbm.handler.atmosphere.IBlockSealable;
 import com.hbm.interfaces.IAnimatedDoor;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.TEDoorAnimationPacket;
+import com.hbm.packet.toclient.TEDoorAnimationPacket;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.machine.TileEntityLockableBase;
 import com.hbm.util.fauxpointtwelve.BlockPos;
@@ -136,9 +137,11 @@ public class TileEntityDoorGeneric extends TileEntityLockableBase implements IAn
 			}
 			if(state == 3 && openTicks == getDoorType().timeToOpen()) {
 				state = 1;
+				((IBlockSealable)blockType).updateSealedState(worldObj, xCoord, yCoord, zCoord);
 			}
 			if(state == 2 && openTicks == 0) {
 				state = 0;
+				((IBlockSealable)blockType).updateSealedState(worldObj, xCoord, yCoord, zCoord);
 			}
 			PacketDispatcher.wrapper.sendToAllAround(new TEDoorAnimationPacket(xCoord, yCoord, zCoord, state, skinIndex, (byte)(shouldUseBB ? 1 : 0)), new TargetPoint(worldObj.provider.dimensionId, xCoord, yCoord, zCoord, 100));
 			

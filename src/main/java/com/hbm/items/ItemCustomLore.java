@@ -3,6 +3,8 @@ package com.hbm.items;
 import java.util.List;
 import java.util.Random;
 
+import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockBobble.BobbleType;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.I18nUtil;
@@ -51,26 +53,31 @@ public class ItemCustomLore extends Item {
 		
 		if(this == ModItems.undefined) {
 			
-			if(player.worldObj.rand.nextInt(10) == 0) {
-				list.add(EnumChatFormatting.DARK_RED + "UNDEFINED");
-			} else {
-				Random rand = new Random(System.currentTimeMillis() / 500);
-				
-				if(setSize == 0)
-					setSize = Item.itemRegistry.getKeys().size();
-				
-				int r = rand.nextInt(setSize);
-				
-				Item item = Item.getItemById(r);
-				
-				if(item != null) {
-					list.add(new ItemStack(item).getDisplayName());
+			try {
+				if(player.worldObj.rand.nextInt(10) == 0) {
+					list.add(EnumChatFormatting.DARK_RED + "UNDEFINED");
 				} else {
-					list.add(EnumChatFormatting.RED + "ERROR #" + r);
+					Random rand = new Random(System.currentTimeMillis() / 500);
+					
+					if(setSize == 0)
+						setSize = Item.itemRegistry.getKeys().size();
+					
+					int r = rand.nextInt(setSize);
+					
+					Item item = Item.getItemById(r);
+					
+					if(item != null) {
+						list.add(new ItemStack(item).getDisplayName());
+					} else {
+						list.add(EnumChatFormatting.RED + "ERROR #" + r);
+					}
 				}
+			} catch(Exception ex) {
+				list.add(EnumChatFormatting.DARK_RED + "UNDEFINED");
 			}
 		}
 	}
+	
 	
 	static int setSize = 0;
 
