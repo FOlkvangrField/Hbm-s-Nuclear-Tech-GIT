@@ -122,6 +122,7 @@ public class TileEntityCrucible extends TileEntityMachineBase implements IGUIPro
 								if(stack.stackSize == 1) {
 									slots[i] = stack.copy();
 									item.setDead();
+									item.delayBeforeCanPickup = 60;
 									break;
 								} else {
 									slots[i] = stack.copy();
@@ -378,9 +379,9 @@ public class TileEntityCrucible extends TileEntityMachineBase implements IGUIPro
 			CrucibleRecipe recipe = getLoadedRecipe();
 
 			for(MaterialStack material : materials) {
-				boolean mainStack = recipe != null && (getQuantaFromType(recipe.input, material.material) > 0 || getQuantaFromType(recipe.output, material.material) > 0);
+				boolean recipeMaterial = recipe != null && (getQuantaFromType(recipe.input, material.material) > 0 || getQuantaFromType(recipe.output, material.material) > 0);
 
-				if(mainStack) {
+				if(recipe == null || recipeMaterial) {
 					this.addToStack(this.recipeStack, material);
 				} else {
 					this.addToStack(this.wasteStack, material);

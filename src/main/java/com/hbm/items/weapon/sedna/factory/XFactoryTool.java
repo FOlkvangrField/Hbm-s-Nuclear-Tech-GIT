@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.generic.BlockNTMSand.EnumSandType;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorBulkie;
@@ -24,7 +25,6 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.factory.GunFactory.EnumAmmo;
 import com.hbm.items.weapon.sedna.impl.ItemGunChargeThrower;
-import com.hbm.items.weapon.sedna.impl.ItemGunDrill;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;
@@ -169,7 +169,7 @@ public class XFactoryTool {
 				} else {
 					int meta = bullet.worldObj.getBlockMetadata(ix, iy, iz);
 					if(meta < 6) bullet.worldObj.setBlockMetadataWithNotify(ix, iy, iz, meta + 1, 3);
-					else bullet.worldObj.setBlock(ix, iy, iz, ModBlocks.sand_boron);
+					else bullet.worldObj.setBlock(ix, iy, iz, ModBlocks.sand_mix, EnumSandType.BORON.ordinal(), 3);
 				}
 				if(b.getMaterial() == Material.fire) bullet.worldObj.playSoundEffect(bullet.posX, bullet.posY, bullet.posZ, "random.fizz", 1.0F, 1.5F + bullet.worldObj.rand.nextFloat() * 0.5F);
 			}
@@ -181,7 +181,8 @@ public class XFactoryTool {
 			NBTTagCompound data = new NBTTagCompound();
 			data.setString("type", "vanillaExt");
 			data.setString("mode", "blockdust");
-			data.setInteger("block", Block.getIdFromBlock(ModBlocks.sand_boron));
+			data.setInteger("block", Block.getIdFromBlock(ModBlocks.sand_mix));
+			data.setInteger("meta", EnumSandType.BORON.ordinal());
 			data.setDouble("posX", bullet.posX); data.setDouble("posY", bullet.posY); data.setDouble("posZ", bullet.posZ);
 			data.setDouble("mX", bullet.motionX + bullet.worldObj.rand.nextGaussian() * 0.1);
 			data.setDouble("mY", bullet.motionY - 0.2 + bullet.worldObj.rand.nextGaussian() * 0.1);
@@ -275,18 +276,7 @@ public class XFactoryTool {
 						.setupStandardFire().recoil(LAMBDA_RECOIL_CT))
 				.setupStandardConfiguration()
 				.anim(LAMBDA_CT_ANIMS).orchestra(Orchestras.ORCHESTRA_CHARGE_THROWER)
-				).setUnlocalizedName("gun_charge_thrower");
-
-		ModItems.gun_drill = new ItemGunDrill(WeaponQuality.UTILITY, new GunConfig()
-				.dura(3_000).draw(10).inspect(55).reloadChangeType(true).hideCrosshair(false).crosshair(Crosshair.L_CIRCUMFLEX)
-				.rec(new Receiver(0)
-						.dmg(10F).delay(4).dry(10).auto(true).spread(0F).spreadHipfire(0F).reload(60).jam(0).sound("hbm:weapon.fire.grenade", 1.0F, 1.0F)
-						.mag(new MagazineFullReload(0, 1).addConfigs(ct_hook, ct_mortar, ct_mortar_charge))
-						.offset(1, -0.0625 * 2.5, -0.25D)
-						.setupStandardFire())
-				.setupStandardConfiguration()
-				//.anim(LAMBDA_CT_ANIMS).orchestra(Orchestras.ORCHESTRA_CHARGE_THROWER)
-				).setUnlocalizedName("gun_drill");
+				).setDefaultAmmo(EnumAmmo.CT_MORTAR, 3).setUnlocalizedName("gun_charge_thrower");
 	}
 
 	public static BiConsumer<ItemStack, LambdaContext> LAMBDA_RECOIL_CT = (stack, ctx) -> {

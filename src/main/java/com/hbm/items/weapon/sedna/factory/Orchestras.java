@@ -11,12 +11,15 @@ import com.hbm.items.weapon.sedna.impl.ItemGunChargeThrower;
 import com.hbm.items.weapon.sedna.impl.ItemGunStinger;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
-import com.hbm.items.weapon.sedna.mods.WeaponModManager;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.toclient.AuxParticlePacketNT;
+import com.hbm.packet.toclient.MuzzleFlashPacket;
 import com.hbm.particle.SpentCasing;
 import com.hbm.particle.helper.CasingCreator;
+import com.hbm.render.anim.HbmAnimations;
 import com.hbm.render.anim.AnimationEnums.GunAnimation;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.util.EntityDamageUtil;
@@ -57,6 +60,7 @@ public class Orchestras {
 			}
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 11) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -80,6 +84,7 @@ public class Orchestras {
 			if(timer == 55) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverSpin", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 21) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 0.6F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -107,6 +112,7 @@ public class Orchestras {
 			if(timer == 44) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverClose", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 5) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 0.9F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -135,6 +141,7 @@ public class Orchestras {
 			if(timer == 44) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverClose", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 5) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 0.9F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -176,6 +183,7 @@ public class Orchestras {
 			if(timer == 44) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.leverCock", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 14) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.5, -0.125, aiming ? -0.125 : -0.375D, 0, 0.12, -0.12, 0.01, -7.5F + (float)entity.getRNG().nextGaussian() * 5F, (float)entity.getRNG().nextGaussian() * 1.5F, casing.getName(), true, 60, 0.5D, 20);
@@ -199,6 +207,7 @@ public class Orchestras {
 			if(timer == 5) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.openLatch", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 2) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.55, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, 0.18, -0.12, 0.01, -7.5F + (float)entity.getRNG().nextGaussian() * 5F, 12F + (float)entity.getRNG().nextGaussian() * 5F, casing.getName());
@@ -247,6 +256,7 @@ public class Orchestras {
 			if(timer == 29) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.leverCock", 1F, 0.8F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 14) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.3125, -0.125, aiming ? -0.125 : -0.375D, 0, 0.18, -0.12, 0.01, -10F + (float)entity.getRNG().nextGaussian() * 5F, (float)entity.getRNG().nextGaussian() * 2.5F, casing.getName(), true, 60, 0.5D, 20);
@@ -282,6 +292,7 @@ public class Orchestras {
 			if(timer == 29) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.leverCock", 1F, 0.8F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 14) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.3125, -0.125, aiming ? -0.125 : -0.375D, 0, -0.08, 0, 0.01, -15F + (float)entity.getRNG().nextGaussian() * 5F, (float)entity.getRNG().nextGaussian() * 2.5F, casing.getName(), true, 60, 0.5D, 20);
@@ -302,6 +313,7 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 14) {
 				int offset = ctx.configIndex == 0 ? -1 : 1;
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
@@ -367,6 +379,7 @@ public class Orchestras {
 			}
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 11) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 1F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -387,6 +400,7 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 1) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.3125, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, 0.21, -0.06, 0.01, -10F + (float)entity.getRNG().nextGaussian() * 2.5F, 2.5F + (float)entity.getRNG().nextGaussian() * 2F, casing.getName(), true, 60, 0.5D, 20);
@@ -423,6 +437,7 @@ public class Orchestras {
 		if(ClientConfig.GUN_ANIMS_LEGACY.get()) {
 			if(type == GunAnimation.CYCLE) {
 				if(timer == 0) {
+					PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.4375, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, -0.06, 0, 0.01, (float)entity.getRNG().nextGaussian() * 10F, (float)entity.getRNG().nextGaussian() * 10F, casing.getName());
 				}
@@ -447,6 +462,7 @@ public class Orchestras {
 		} else {
 			if(type == GunAnimation.CYCLE) {
 				if(timer == 0) {
+					PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.4375, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, -0.06, 0, 0.01, (float)entity.getRNG().nextGaussian() * 10F, (float)entity.getRNG().nextGaussian() * 10F, casing.getName());
 				}
@@ -477,7 +493,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 0.75F);
 			if(timer == 4) {
@@ -523,6 +542,7 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 15) {
 				IMagazine mag = ctx.config.getReceivers(stack)[0].getMagazine(stack);
 				SpentCasing casing = mag.getCasing(stack, ctx.inventory);
@@ -552,11 +572,11 @@ public class Orchestras {
 					AudioWrapper audio = MainRegistry.proxy.getLoopedSound("hbm:weapon.fire.flameLoop", (float) entity.posX, (float) entity.posY, (float) entity.posZ, 1F, 15F, 1F, 10);
 					ItemGunBaseNT.loopedSounds.put(entity, audio);
 					audio.startSound();
+					audio.attachTo(entity);
 				}
 				//keepalive
 				if(runningAudio != null && runningAudio.isPlaying()) {
 					runningAudio.keepAlive();
-					runningAudio.updatePosition((float) entity.posX, (float) entity.posY, (float) entity.posZ);
 				}
 			} else {
 				//stop sound due to timeout
@@ -602,6 +622,7 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 1) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.375, aiming ? 0 : -0.0625, aiming ? 0 : -0.25D, 0, 0.18, -0.12, 0.01, -10F + (float)entity.getRNG().nextGaussian() * 5F, 10F + entity.getRNG().nextFloat() * 10F, casing.getName());
@@ -635,6 +656,7 @@ public class Orchestras {
 			if(timer == 8) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.openLatch", 1F, 1.25F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 1) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.375, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, 0.18, -0.12, 0.01, -2.5F + (float)entity.getRNG().nextGaussian() * 5F, 10F + (float)entity.getRNG().nextFloat() * 15F, casing.getName());
@@ -666,6 +688,7 @@ public class Orchestras {
 			if(timer == 8) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.openLatch", 1F, 1.25F);
 		}
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 1) {
 				int mult = ctx.configIndex == 0 ? -1 : 1;
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
@@ -696,6 +719,7 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE || type == GunAnimation.ALT_CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 8) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.shotgunCock", 1F, 1F);
 			if(timer == 10) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory); //turns out there's a reason why stovepipes look like that
@@ -733,7 +757,9 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 30) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertCanister", 1F, 1F);
 		}
@@ -744,13 +770,14 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-		boolean scoped = stack.getItem() == ModItems.gun_g3_zebra || WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SCOPE);
+		boolean scoped = stack.getItem() == ModItems.gun_g3_zebra || XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack) && !scoped;
 
 		if(type == GunAnimation.CYCLE) {
 			if(timer == 0) {
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.5, aiming ? 0 : -0.125, aiming ? 0 : -0.25D, 0, 0.18, -0.12, 0.01, (float)entity.getRNG().nextGaussian() * 5F, 12.5F + (float)entity.getRNG().nextFloat() * 5F, casing.getName());
+				PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			}
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -799,8 +826,11 @@ public class Orchestras {
 				//stop sound due to timeout
 				if(runningAudio != null && runningAudio.isPlaying()) runningAudio.stopSound();
 			}
+			return;
 		}
-
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 30) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertCanister", 1F, 1F);
 		}
@@ -820,11 +850,12 @@ public class Orchestras {
 					AudioWrapper audio = MainRegistry.proxy.getLoopedSound("hbm:weapon.fire.flameLoop", (float) entity.posX, (float) entity.posY, (float) entity.posZ, 1F, 15F, 1F, 10);
 					ItemGunBaseNT.loopedSounds.put(entity, audio);
 					audio.startSound();
+					audio.attachTo(entity);
 				}
 				//keepalive
 				if(runningAudio != null && runningAudio.isPlaying()) {
 					runningAudio.keepAlive();
-					runningAudio.updatePosition((float) entity.posX, (float) entity.posY, (float) entity.posZ);
+					runningAudio.attachTo(entity);
 				}
 			} else {
 				//stop sound due to timeout
@@ -851,6 +882,7 @@ public class Orchestras {
 		}
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 7) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltOpen", 0.5F, 1F);
 			if(timer == 16) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltClose", 0.5F, 1F);
 			if(timer == 12) {
@@ -901,6 +933,7 @@ public class Orchestras {
 
 		if(type == GunAnimation.CYCLE) {
 			if(timer == 0) {
+				PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 				if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.375, aiming ? 0 : -0.125, aiming ? 0 : -0.3125D, 0, 0.06, -0.18, 0.01, (float)entity.getRNG().nextGaussian() * 20F, 12.5F + (float)entity.getRNG().nextGaussian() * 7.5F, casing.getName());
 			}
@@ -914,6 +947,7 @@ public class Orchestras {
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 2) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.fire.shredderCycle", 0.25F, 1.5F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
@@ -938,8 +972,11 @@ public class Orchestras {
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == GunAnimation.CYCLE) {
-			if(timer == 0 && ctx.config.getReceivers(stack)[0].getMagazine(stack).getType(stack, null) == XFactory12ga.g12_equestrian_bj) {
-				ItemGunBaseNT.setTimer(stack, 0, 20);
+			if(timer == 0) {
+				PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+				if(ctx.config.getReceivers(stack)[0].getMagazine(stack).getType(stack, null) == XFactory12ga.g12_equestrian_bj) {
+					ItemGunBaseNT.setTimer(stack, 0, 20);
+				}
 			}
 
 			if(timer == 2) {
@@ -984,7 +1021,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 30) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertCanister", 1F, 1F);
 		}
@@ -999,13 +1039,14 @@ public class Orchestras {
 
 		if(type == GunAnimation.CYCLE) {
 			if(timer == 0) {
-				int rounds = WeaponModManager.hasUpgrade(stack, ctx.configIndex, WeaponModManager.ID_MINIGUN_SPEED) ? 3 : 1;
+				PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+				int rounds = XWeaponModManager.hasUpgrade(stack, ctx.configIndex, XWeaponModManager.ID_MINIGUN_SPEED) ? 3 : 1;
 				for(int i = 0; i < rounds; i++) {
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, aiming ? 0.125 : 0.5, aiming ? -0.125 : -0.25, aiming ? -0.25 : -0.5D, 0, 0.18, -0.12, 0.01, (float)entity.getRNG().nextGaussian() * 15F, (float)entity.getRNG().nextGaussian() * 15F, casing.getName());
 				}
 			}
-			if(timer == (WeaponModManager.hasUpgrade(stack, 0, 207) ? 3 : 1)) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverSpin", 1F, 0.75F);
+			if(timer == (XWeaponModManager.hasUpgrade(stack, 0, 207) ? 3 : 1)) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverSpin", 1F, 0.75F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 0.75F);
@@ -1027,14 +1068,15 @@ public class Orchestras {
 
 		if(type == GunAnimation.CYCLE) {
 			if(timer == 0) {
+				PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 				int index = ctx.configIndex == 0 ? -1 : 1;
-				int rounds = WeaponModManager.hasUpgrade(stack, ctx.configIndex, WeaponModManager.ID_MINIGUN_SPEED) ? 3 : 1;
+				int rounds = XWeaponModManager.hasUpgrade(stack, ctx.configIndex, XWeaponModManager.ID_MINIGUN_SPEED) ? 3 : 1;
 				for(int i = 0; i < rounds; i++) {
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, 0.25, -0.25, -0.5D * index, 0, 0.18, -0.12 * index, 0.01, (float)entity.getRNG().nextGaussian() * 15F, (float)entity.getRNG().nextGaussian() * 15F, casing.getName());
 				}
 			}
-			if(timer == (WeaponModManager.hasUpgrade(stack, 0, 207) ? 3 : 1)) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverSpin", 1F, 0.75F);
+			if(timer == (XWeaponModManager.hasUpgrade(stack, 0, 207) ? 3 : 1)) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverSpin", 1F, 0.75F);
 		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 0.75F);
@@ -1053,7 +1095,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 1.25F);
 		}
@@ -1092,7 +1137,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 1.5F);
 		}
@@ -1121,6 +1169,7 @@ public class Orchestras {
 		if(ClientConfig.GUN_ANIMS_LEGACY.get()) {
 			if(type == GunAnimation.CYCLE) {
 				if(timer == 0) {
+					PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, aiming ? 0.125 : 0.125, aiming ? -0.125 : -0.25, aiming ? -0.125 : -0.25D, 0, 0.18, -0.12, 0.01, (float)entity.getRNG().nextGaussian() * 5F, 7.5F + entity.getRNG().nextFloat() * 5F, casing.getName());
 				}
@@ -1147,6 +1196,7 @@ public class Orchestras {
 		} else {
 			if(type == GunAnimation.CYCLE) {
 				if(timer == 0) {
+					PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 					SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
 					if(casing != null) CasingCreator.composeEffect(entity.worldObj, entity, aiming ? 0.125 : 0.25, aiming ? -0.125 : -0.25, aiming ? -0.125 : -0.25D, 0, 0.18, -0.12, 0.01, (float)entity.getRNG().nextGaussian() * 5F, 7.5F + entity.getRNG().nextFloat() * 5F, casing.getName());
 				}
@@ -1188,10 +1238,11 @@ public class Orchestras {
 					audio.updatePitch(0.75F);
 					ItemGunBaseNT.loopedSounds.put(entity, audio);
 					audio.startSound();
+					audio.attachTo(entity);
 				}
 				if(runningAudio != null && runningAudio.isPlaying()) {
 					runningAudio.keepAlive();
-					runningAudio.updatePosition((float) entity.posX, (float) entity.posY, (float) entity.posZ);
+					runningAudio.attachTo(entity);
 					runningAudio.updatePitch(0.75F + timer * 0.01F);
 				}
 			} else {
@@ -1266,7 +1317,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 1.5F);
 		}
@@ -1296,7 +1350,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE && stack.getItem() == ModItems.gun_n_i_4_n_i) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.coilgunReload", 1F, 1F);
 		}
@@ -1307,7 +1364,10 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-
+		
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 0) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 1F);
 		}
@@ -1410,7 +1470,9 @@ public class Orchestras {
 			if(timer == 5) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverCock", 1F, 0.75F);
 			if(timer == 19) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverClose", 1F, 0.8F);
 		}
-
+		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
+		}
 		if(type == GunAnimation.CYCLE_DRY) {
 			if(timer == 2) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.dryFireClick", 1F, 1F);
 		}
@@ -1430,6 +1492,7 @@ public class Orchestras {
 		}
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 1) {
 				int cba = (stack.getItem() == ModItems.gun_aberrator_eott && ctx.configIndex == 0) ? -1 : 1;
 				SpentCasing casing = ctx.config.getReceivers(stack)[0].getMagazine(stack).getCasing(stack, ctx.inventory);
@@ -1448,7 +1511,7 @@ public class Orchestras {
 		if(entity.worldObj.isRemote) return;
 		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
 		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
-		boolean aiming = ItemGunBaseNT.getIsAiming(stack) && !WeaponModManager.hasUpgrade(stack, 0, WeaponModManager.ID_SCOPE);
+		boolean aiming = ItemGunBaseNT.getIsAiming(stack) && !XWeaponModManager.hasUpgrade(stack, 0, XWeaponModManager.ID_SCOPE);
 
 		if(type == GunAnimation.EQUIP) {
 			if(timer == 10) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.openLatch", 1F, 1F);
@@ -1456,6 +1519,7 @@ public class Orchestras {
 		}
 
 		if(type == GunAnimation.CYCLE) {
+			if(timer == 0) PacketDispatcher.wrapper.sendToAllAround(new MuzzleFlashPacket(entity), new TargetPoint(entity.worldObj.provider.dimensionId, entity.posX, entity.posY, entity.posZ, 100));
 			if(timer == 7) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltOpen", 0.5F, 1F);
 			if(timer == 16) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltClose", 0.5F, 1F);
 			if(timer == 12) {
@@ -1517,6 +1581,53 @@ public class Orchestras {
 		if(type == GunAnimation.RELOAD) {
 			if(timer == 30) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertRocket", 1F, 1F);
 			if(timer == 40) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.boltClose", 1F, 1F);
+		}
+	};
+
+	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_DRILL = (stack, ctx) -> {
+		EntityLivingBase entity = ctx.entity;
+		GunAnimation type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+
+		if(entity.worldObj.isRemote) {
+			double speed = HbmAnimations.getRelevantTransformation("SPEED")[0];
+			
+			AudioWrapper runningAudio = ItemGunBaseNT.loopedSounds.get(entity);
+
+			if(speed > 0) {
+				//start sound
+				if(runningAudio == null || !runningAudio.isPlaying()) {
+					boolean electric = XWeaponModManager.hasUpgrade(stack, ctx.configIndex, XWeaponModManager.ID_ENGINE_ELECTRIC);
+					AudioWrapper audio = MainRegistry.proxy.getLoopedSound(electric ? "hbm:block.largeTurbineRunning" : "hbm:block.engine", (float) entity.posX, (float) entity.posY, (float) entity.posZ, (float) speed, 15F, (float) speed, 25);
+					ItemGunBaseNT.loopedSounds.put(entity, audio);
+					audio.startSound();
+					audio.attachTo(entity);
+				}
+				//keepalive
+				if(runningAudio != null && runningAudio.isPlaying()) {
+					runningAudio.keepAlive();
+					runningAudio.updateVolume((float) speed);
+					runningAudio.updatePitch((float) speed);
+				}
+			} else {
+				//stop sound due to timeout
+				//if(runningAudio != null && runningAudio.isPlaying()) runningAudio.stopSound();
+				// for some reason this causes stutters, even though speed shouldn't be 0 then
+			}
+		}
+		//stop sound due to state change
+		if(type != GunAnimation.CYCLE && type != GunAnimation.CYCLE_DRY && entity.worldObj.isRemote) {
+			AudioWrapper runningAudio = ItemGunBaseNT.loopedSounds.get(entity);
+			if(runningAudio != null && runningAudio.isPlaying()) runningAudio.stopSound();
+		}
+		if(entity.worldObj.isRemote) return;
+
+		if(type == GunAnimation.RELOAD) {
+			if(timer == 15) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.openLatch", 1F, 1F);
+			if(timer == 35) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.impact", 0.5F, 1F);
+			if(timer == 60) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.revolverClose", 1F, 0.75F);
+			if(timer == 70) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.insertCanister", 1F, 1F);
+			if(timer == 85) entity.worldObj.playSoundAtEntity(entity, "hbm:weapon.reload.pressureValve", 1F, 1F);
 		}
 	};
 }
