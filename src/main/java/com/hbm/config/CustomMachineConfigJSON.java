@@ -29,8 +29,6 @@ import com.hbm.main.CraftingManager;
 import com.hbm.main.MainRegistry;
 
 import com.hbm.render.loader.HFRWavefrontObject;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundEventAccessorComposite;
@@ -45,6 +43,7 @@ public class CustomMachineConfigJSON {
 	public static final Gson gson = new Gson();
 	public static HashMap<String, MachineConfiguration> customMachines = new HashMap();
 	public static HashMap<String, IModelCustom> customModels = new HashMap();
+	public static HashMap<String, ResourceLocation> customModelTexs = new HashMap();
 
 	public static List<MachineConfiguration> niceList = new ArrayList();
 
@@ -305,6 +304,7 @@ public class CustomMachineConfigJSON {
 	public static void registerCustomModels() {
 		for (MachineConfiguration config : niceList){
 			customModels.put(config.unlocalizedName, new HFRWavefrontObject(new ResourceLocation(RefStrings.MODID, config.customModel.customModel)));
+			customModelTexs.put(config.unlocalizedName, new ResourceLocation(RefStrings.MODID, config.customModel.modelTexture));
 		}
 	}
 	public static void doesSoundExist() {

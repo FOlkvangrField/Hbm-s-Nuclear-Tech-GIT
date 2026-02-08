@@ -1,7 +1,6 @@
 package com.hbm.render.tileentity;
 
 import com.hbm.config.CustomMachineConfigJSON;
-import com.hbm.lib.RefStrings;
 import com.hbm.render.util.SmallBlockPronter;
 import com.hbm.tileentity.machine.TileEntityCustomMachine;
 
@@ -13,6 +12,7 @@ import net.minecraftforge.client.model.IModelCustom;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
+import static com.hbm.config.CustomMachineConfigJSON.customModelTexs;
 import static com.hbm.config.CustomMachineConfigJSON.customModels;
 
 public class RenderCustomMachine extends TileEntitySpecialRenderer {
@@ -54,7 +54,7 @@ public class RenderCustomMachine extends TileEntitySpecialRenderer {
 			else if(config.customModel!=null){
 				try{
 					IModelCustom customModel = customModels.get(config.unlocalizedName);
-					ResourceLocation modelTexture = new ResourceLocation(RefStrings.MODID, config.customModel.modelTexture);
+					ResourceLocation modelTexture = customModelTexs.get(config.unlocalizedName);
 					GL11.glPushMatrix();
 					double rx = -dir.offsetX * (config.customModel.model_x) + 0.5;
 					double ry = +(config.customModel.model_y);
