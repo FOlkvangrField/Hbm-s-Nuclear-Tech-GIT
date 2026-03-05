@@ -125,10 +125,10 @@ public class HFRWavefrontObject implements IModelCustomNamed {
 						currentGroupObject = new S_GroupObject("Default");
 					}
 
-					List<S_Face> faces = parseFace(currentLine, lineCount);
+					S_Face face = parseFace(currentLine, lineCount);
 
-					if(faces != null && !faces.isEmpty()) {
-						currentGroupObject.faces.addAll(faces);
+					if(face != null) {
+						currentGroupObject.faces.add(face);
 					}
 				} else if(currentLine.startsWith("g ") | currentLine.startsWith("o ")) {
 					S_GroupObject group = parseGroupObject(currentLine, lineCount);
@@ -322,105 +322,93 @@ public class HFRWavefrontObject implements IModelCustomNamed {
 		return textureCoordinate;
 	}
 
-	private List<S_Face> parseFace(String line, int lineCount) throws ModelFormatException {
-		List<S_Face> parsedFaces = new ArrayList<S_Face>();
+	private S_Face parseFace(String line, int lineCount) throws ModelFormatException {
+		S_Face face = null;
 
 		if(isValidFaceLine(line)) {
-			if(currentGroupObject.glDrawingMode == -1 || currentGroupObject.glDrawingMode == GL11.GL_QUADS) {
-				currentGroupObject.glDrawingMode = GL11.GL_TRIANGLES;
-			}
+			face = new S_Face(this.smoothing);
 
 			String trimmedLine = line.substring(line.indexOf(" ") + 1);
 			String[] tokens = trimmedLine.split(" ");
 			String[] subTokens = null;
 
-			Vertex[] tempVertices = new Vertex[tokens.length];
-			TextureCoordinate[] tempTexCoords = new TextureCoordinate[tokens.length];
-			Vertex[] tempNormals = new Vertex[tokens.length];
-
-			boolean hasTexture = false;
+			if(tokens.length == 3) {
+				if(currentGroupObject.glDrawingMode == -1) {
+					currentGroupObject.glDrawingMode = GL11.GL_TRIANGLES;
+				} else if(currentGroupObject.glDrawingMode != GL11.GL_TRIANGLES) {
+					throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName
+						+ "' - Invalid number of points for face (expected 4, found " + tokens.length + ")");
+				}
+			} else if(tokens.length == 4) {
+				if(currentGroupObject.glDrawingMode == -1) {
+					currentGroupObject.glDrawingMode = GL11.GL_QUADS;
+				} else if(currentGroupObject.glDrawingMode != GL11.GL_QUADS) {
+					throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName
+						+ "' - Invalid number of points for face (expected 3, found " + tokens.length + ")");
+				}
+			}
 
 			// f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 ...
 			if(isValidFace_V_VT_VN_Line(line)) {
-				hasTexture = true;
+				face.vertices = new Vertex[tokens.length];
+				face.textureCoordinates = new TextureCoordinate[tokens.length];
+				face.vertexNormals = new Vertex[tokens.length];
+
 				for(int i = 0; i < tokens.length; ++i) {
 					subTokens = tokens[i].split("/");
 
-					tempVertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
-					tempTexCoords[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
-					tempNormals[i] = vertexNormals.get(Integer.parseInt(subTokens[2]) - 1);
+					face.vertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
+					face.textureCoordinates[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
+					face.vertexNormals[i] = vertexNormals.get(Integer.parseInt(subTokens[2]) - 1);
 				}
+
+				face.faceNormal = face.calculateFaceNormal();
 			}
 			// f v1/vt1 v2/vt2 v3/vt3 ...
 			else if(isValidFace_V_VT_Line(line)) {
-				hasTexture = true;
+				face.vertices = new Vertex[tokens.length];
+				face.textureCoordinates = new TextureCoordinate[tokens.length];
+
 				for(int i = 0; i < tokens.length; ++i) {
 					subTokens = tokens[i].split("/");
 
-					tempVertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
-					tempTexCoords[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
+					face.vertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
+					face.textureCoordinates[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
 				}
 
+				face.faceNormal = face.calculateFaceNormal();
 			}
 			// f v1//vn1 v2//vn2 v3//vn3 ...
 			else if(isValidFace_V_VN_Line(line)) {
+				face.vertices = new Vertex[tokens.length];
+				face.vertexNormals = new Vertex[tokens.length];
+
 				for(int i = 0; i < tokens.length; ++i) {
 					subTokens = tokens[i].split("//");
 
-					tempVertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
-					tempNormals[i] = vertexNormals.get(Integer.parseInt(subTokens[1]) - 1);
+					face.vertices[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
+					face.vertexNormals[i] = vertexNormals.get(Integer.parseInt(subTokens[1]) - 1);
 				}
+
+				face.faceNormal = face.calculateFaceNormal();
 			}
 			// f v1 v2 v3 ...
 			else if(isValidFace_V_Line(line)) {
+				face.vertices = new Vertex[tokens.length];
+
 				for(int i = 0; i < tokens.length; ++i) {
-					tempVertices[i] = vertices.get(Integer.parseInt(tokens[i]) - 1);
+					face.vertices[i] = vertices.get(Integer.parseInt(tokens[i]) - 1);
 				}
+
+				face.faceNormal = face.calculateFaceNormal();
 			} else {
 				throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Incorrect format");
-			}
-
-			if (tokens.length == 3) {
-				S_Face face = new S_Face(this.smoothing);
-				face.vertices = tempVertices;
-				face.textureCoordinates = hasTexture ? tempTexCoords : null;
-				face.vertexNormals = tempNormals;
-				face.faceNormal = face.calculateFaceNormal();
-				parsedFaces.add(face);
-
-			} else if (tokens.length == 4) {
-
-				S_Face t1 = new S_Face(this.smoothing);
-				t1.vertices = new Vertex[] { tempVertices[0], tempVertices[1], tempVertices[2] };
-				t1.textureCoordinates = hasTexture ? new TextureCoordinate[] {
-					tempTexCoords[0], tempTexCoords[1], tempTexCoords[2]
-				} : null;
-				t1.vertexNormals = new Vertex[] {
-					tempNormals[0] != null ? tempNormals[0] : null,
-					tempNormals[1] != null ? tempNormals[1] : null,
-					tempNormals[2] != null ? tempNormals[2] : null
-				};
-				t1.faceNormal = t1.calculateFaceNormal();
-				parsedFaces.add(t1);
-
-				S_Face t2 = new S_Face(this.smoothing);
-				t2.vertices = new Vertex[] { tempVertices[0], tempVertices[2], tempVertices[3] };
-				t2.textureCoordinates = hasTexture ? new TextureCoordinate[] {
-					tempTexCoords[0], tempTexCoords[2], tempTexCoords[3]
-				} : null;
-				t2.vertexNormals = new Vertex[] {
-					tempNormals[0] != null ? tempNormals[0] : null,
-					tempNormals[2] != null ? tempNormals[2] : null,
-					tempNormals[3] != null ? tempNormals[3] : null
-				};
-				t2.faceNormal = t2.calculateFaceNormal();
-				parsedFaces.add(t2);
 			}
 		} else {
 			throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Incorrect format");
 		}
 
-		return parsedFaces;
+		return face;
 	}
 
 	private S_GroupObject parseGroupObject(String line, int lineCount) throws ModelFormatException {
