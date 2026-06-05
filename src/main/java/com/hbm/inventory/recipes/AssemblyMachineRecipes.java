@@ -1180,7 +1180,7 @@ public class AssemblyMachineRecipes extends GenericRecipes<GenericRecipe> {
 						new ComparableStack(ModItems.catalyst_clay, 12),
 						new ComparableStack(ModItems.coil_tungsten, 8))
 				.inputItemsEx(
-						new ComparableStack(ModItems.item_expensive, 4, EnumExpensiveType.STAINLESS_BEAM),
+						new OreDictStack(STAINLESS.plateWelded(), 4),
 						new ComparableStack(ModItems.item_expensive, 4, EnumExpensiveType.STEEL_PLATING),
 						new ComparableStack(ModItems.circuit, 8, EnumCircuitType.CAPACITOR),
 						new ComparableStack(ModItems.catalyst_clay, 12),
