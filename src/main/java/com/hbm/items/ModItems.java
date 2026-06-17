@@ -2721,7 +2721,7 @@ public class ModItems {
 		plate_combine_steel = new Item().setUnlocalizedName("plate_combine_steel").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":plate_combine_steel");
 		ingot_palladium = new ItemCustomLore().setUnlocalizedName("ingot_palladium").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":ingot_palladium");
 		scuttertail = new Item().setUnlocalizedName("scuttertail").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":scuttertail");
-		saltleaf = new Item().setUnlocalizedName("saltleaf").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":salt_leaf");
+		saltleaf = new ItemLemon(2, 0.5F, false).setUnlocalizedName("saltleaf").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":salt_leaf");
 		leaf_rubber = new Item().setUnlocalizedName("rubber_leaves").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":rubber_leaves");
 		leaf_pet = new Item().setUnlocalizedName("pet_leaves").setCreativeTab(MainRegistry.partsTab).setTextureName(RefStrings.MODID + ":pet_leaves");
 
