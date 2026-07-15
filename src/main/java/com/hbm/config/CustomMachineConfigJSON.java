@@ -77,6 +77,9 @@ public class CustomMachineConfigJSON {
 			writer.name("recipeConsumptionMult").value(1.0D);
 			writer.name("maxPower").value(10_000L);
 			writer.name("maxHeat").value(0);
+			writer.name("materialInCount").value(0);
+			writer.name("materialInCap").value(0);
+			writer.name("materialOut").value(false);
 
 			writer.name("recipeShape").beginArray();
 			writer.value("IPI").value("PCP").value("IPI");
@@ -176,6 +179,9 @@ public class CustomMachineConfigJSON {
 				configuration.recipeConsumptionMult = machineObject.get("recipeConsumptionMult").getAsDouble();
 				configuration.maxPower = machineObject.get("maxPower").getAsLong();
 				if(machineObject.has("maxHeat")) configuration.maxHeat = machineObject.get("maxHeat").getAsInt();
+				if(machineObject.has("materialInCount")) configuration.materialInCount = machineObject.get("materialInCount").getAsInt();
+				if(machineObject.has("materialInCap")) configuration.materialInCap = machineObject.get("materialInCap").getAsInt();
+				if(machineObject.has("materialOut")) configuration.materialOut = machineObject.get("materialOut").getAsBoolean();
 
 				if(machineObject.has("recipeShape") && machineObject.has("recipeParts")) {
 					try {
@@ -267,6 +273,9 @@ public class CustomMachineConfigJSON {
 		public double recipeConsumptionMult = 1D;
 		public long maxPower;
 		public int maxHeat;
+		public int materialInCount;
+		public int materialInCap;
+		public boolean materialOut;
 
 
 		/** Definitions of blocks that this machine is composed of */
