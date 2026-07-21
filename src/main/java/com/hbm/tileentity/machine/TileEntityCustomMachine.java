@@ -18,7 +18,9 @@ import com.hbm.inventory.gui.GUIMachineCustom;
 import com.hbm.inventory.recipes.CustomMachineRecipes;
 import com.hbm.inventory.recipes.CustomMachineRecipes.CustomMachineRecipe;
 import com.hbm.lib.Library;
+import com.hbm.main.MainRegistry;
 import com.hbm.module.ModulePatternMatcher;
+import com.hbm.sound.AudioWrapper;
 import com.hbm.tileentity.IGUIProvider;
 import com.hbm.tileentity.TileEntityMachinePolluting;
 import com.hbm.tileentity.TileEntityProxyBase;
@@ -40,6 +42,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -70,14 +73,21 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 	public int maxHeat;
 	public int progress;
 	public int maxProgress = 1;
+	public boolean isProgressing;
+	public int networkTicker = 0;
 	public FluidTank[] inputTanks;
 	public FluidTank[] outputTanks;
 	public ModulePatternMatcher matcher;
 	public int structureCheckDelay;
 	public boolean structureOK = false;
+	public int ghostAnimationIndex = 0;
+	private AudioWrapper audio;
 	public CustomMachineRecipe cachedRecipe;
 	public List<MaterialStack> materials = new ArrayList();
 
+	private static final int[] EMPTY_SLOTS = new int[0];
+	private int[] accessibleSlots = null;
+	private int cachedItemInCount = -1;
 	public List<DirPos> connectionPos = new ArrayList();
 	public List<DirPos> fluxPos = new ArrayList();
 	public List<DirPos> heatPos = new ArrayList();
@@ -98,6 +108,7 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 
 		if (config != null) {
 			this.config = config;
+			this.bb = null; // invalidate cached bounding box since config changed
 
 			inputTanks = new FluidTank[config.fluidInCount];
 			for (int i = 0; i < inputTanks.length; i++) inputTanks[i] = new FluidTank(Fluids.NONE, config.fluidInCap);
@@ -178,7 +189,7 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 				worldObj.func_147480_a(xCoord, yCoord, zCoord, false);
 				return;
 			}
-
+			this.isProgressing = false;
 			this.power = Library.chargeTEFromItems(slots, 0, power, this.config.maxPower);
 
 			if (this.inputTanks.length > 0) this.inputTanks[0].setType(1, slots);
@@ -270,6 +281,7 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 					}
 
 					if (this.cachedRecipe != null) {
+						isProgressing = true;
 						this.maxProgress = (int) Math.max(cachedRecipe.duration / this.config.recipeSpeedMult, 1);
 						int powerReq = (int) Math.max(cachedRecipe.consumptionPerTick * this.config.recipeConsumptionMult, 1);
 
@@ -316,7 +328,38 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 			} else {
 				this.progress = 0;
 			}
-			this.networkPackNT(50);
+			// Adaptive sync: 50t when active, 200t when idle
+			int sendInterval = this.isProgressing ? 50 : 200;
+			this.networkTicker++;
+			if(this.networkTicker >= sendInterval) {
+				this.networkTicker = 0;
+				this.networkPackNT(50);
+			}
+		} else {
+			// Pre-compute ghost animation index so renderer doesn't call System.currentTimeMillis()
+			if(!this.structureOK && this.config != null && this.config.components != null
+				&& !this.config.components.isEmpty()) {
+				this.ghostAnimationIndex = (int)((this.worldObj.getTotalWorldTime() / 20)
+					% this.config.components.size());
+			}
+
+			float volume = this.getVolume(1F);
+			if (this.isProgressing && config.progressSound!=null && MainRegistry.proxy.me().getDistance(xCoord, yCoord, zCoord) < 50) {
+				if (audio == null) {
+					audio = this.createAudioLoop();
+					audio.startSound();
+				} else if (!audio.isPlaying()) {
+					audio = rebootAudio(audio);
+				}
+				audio.keepAlive();
+				audio.updateVolume(volume);
+			} else {
+				if (audio != null) {
+					audio.stopSound();
+					audio = null;
+				}
+			}
+
 		}
 
 	}
@@ -329,6 +372,7 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 
 		buf.writeLong(power);
 		buf.writeInt(progress);
+		buf.writeBoolean(isProgressing);
 		buf.writeInt(flux);
 		buf.writeInt(heat);
 		buf.writeBoolean(structureOK);
@@ -354,6 +398,7 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 
 		this.power = buf.readLong();
 		this.progress = buf.readInt();
+		this.isProgressing = buf.readBoolean();
 		this.flux = buf.readInt();
 		this.heat = buf.readInt();
 		this.structureOK = buf.readBoolean();
@@ -373,12 +418,52 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 			}
 		}
 	}
+	@Override
+	public AudioWrapper createAudioLoop() {
+		return MainRegistry.proxy.getLoopedSound(config.progressSound, xCoord, yCoord, zCoord, 1.0F, 10F, 1.0F);
+	}
+	@Override
+	public void onChunkUnload() {
 
-	/** Only accepts inputs in a fixed order, saves a ton of performance because there's no permutations to check for */
+		if(audio != null) {
+			audio.stopSound();
+			audio = null;
+		}
+	}
+
+	@Override
+	public void invalidate() {
+
+		super.invalidate();
+
+		if(audio != null) {
+			audio.stopSound();
+			audio = null;
+		}
+	}
+	/** Only accepts inputs in a fixed order, saves a ton of performance because there's no permutations to check for.
+	 *  Caches the last matched recipe: validates it against current inputs first (O(slots)),
+	 *  only falls back to full scan (O(recipes × slots)) when inputs changed. */
 	public CustomMachineRecipe getMatchingRecipe() {
 		List<CustomMachineRecipe> recipes = CustomMachineRecipes.recipes.get(this.config.recipeKey);
 		if(recipes == null || recipes.isEmpty()) return null;
 
+		// Fast path: validate cached recipe against current inputs
+		if(cachedRecipe != null) {
+			boolean stillMatches = true;
+			for(int i = 0; i < cachedRecipe.inputFluids.length && stillMatches; i++) {
+				if(this.inputTanks[i].getTankType() != cachedRecipe.inputFluids[i].type
+					|| this.inputTanks[i].getPressure() != cachedRecipe.inputFluids[i].pressure)
+					stillMatches = false;
+			}
+			for(int i = 0; i < cachedRecipe.inputItems.length && stillMatches; i++) {
+				if(cachedRecipe.inputItems[i] != null && slots[i + 4] == null) stillMatches = false;
+				if(!cachedRecipe.inputItems[i].matchesRecipe(slots[i + 4], true)) stillMatches = false;
+			}
+			if(stillMatches) return cachedRecipe;
+		}
+
+		// Slow path: full scan
 		outer:
 		for(CustomMachineRecipe recipe : recipes) {
 			for(int i = 0; i < recipe.inputFluids.length; i++) {
@@ -390,9 +475,11 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 				if(!recipe.inputItems[i].matchesRecipe(slots[i + 4], true)) continue outer;
 			}
 
+			cachedRecipe = recipe;
 			return recipe;
 		}
 
+		cachedRecipe = null;
 		return null;
 	}
 	public void pollution(CustomMachineRecipe recipe) {
@@ -512,6 +599,25 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 		}
 	}
 
+	/**
+	 * Transforms a component's local coordinates to world coordinates, handling rotation.
+	 */
+	protected BlockPos getComponentWorldPos(ComponentDefinition comp) {
+		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
+		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
+
+		int x = xCoord - dir.offsetX * comp.x + rot.offsetX * comp.x;
+		int y = yCoord + comp.y;
+		int z = zCoord - dir.offsetZ * comp.z + rot.offsetZ * comp.z;
+
+		if(dir == ForgeDirection.EAST || dir == ForgeDirection.WEST) {
+			x = xCoord + dir.offsetZ * comp.z - rot.offsetZ * comp.z;
+			z = zCoord + dir.offsetX * comp.x - rot.offsetX * comp.x;
+		}
+
+		return new BlockPos(x, y, z);
+	}
+
 	public boolean checkStructure() {
 
 		this.connectionPos.clear();
@@ -519,21 +625,12 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 		this.structureOK = false;
 		if(this.config == null) return false;
 
-		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
-		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
 		for(ComponentDefinition comp : config.components) {
 
-			/* vvv precisely the same method used for defining ports vvv */
-			int x = xCoord - dir.offsetX * comp.x + rot.offsetX * comp.x;
-			int y = yCoord + comp.y;
-			int z = zCoord - dir.offsetZ * comp.z + rot.offsetZ * comp.z;
-			/* but for EW directions it just stops working entirely */
-			/* there is absolutely zero reason why this should be required */
-			if(dir == ForgeDirection.EAST || dir == ForgeDirection.WEST) {
-				x = xCoord + dir.offsetZ * comp.z - rot.offsetZ * comp.z;
-				z = zCoord + dir.offsetX * comp.x - rot.offsetX * comp.x;
-			}
-			/* i wholeheartedly believe it is the computer who is wrong here */
+			BlockPos pos = getComponentWorldPos(comp);
+			int x = pos.getX();
+			int y = pos.getY();
+			int z = pos.getZ();
 
 			Block b = worldObj.getBlock(x, y, z);
 			if(b != comp.block) return false;
@@ -580,32 +677,29 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 
 		if(this.config == null) return;
 
-		ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
-		ForgeDirection rot = dir.getRotation(ForgeDirection.UP);
-
 		for(ComponentDefinition comp : config.components) {
-
-			int x = xCoord - dir.offsetX * comp.x + rot.offsetX * comp.x;
-			int y = yCoord + comp.y;
-			int z = zCoord - dir.offsetZ * comp.z + rot.offsetZ * comp.z;
-			if(dir == ForgeDirection.EAST || dir == ForgeDirection.WEST) {
-				x = xCoord + dir.offsetZ * comp.z - rot.offsetZ * comp.z;
-				z = zCoord + dir.offsetX * comp.x - rot.offsetX * comp.x;
-			}
-
-			worldObj.setBlock(x, y, z, comp.block, (int) comp.allowedMetas.toArray()[0], 3);
+			BlockPos pos = getComponentWorldPos(comp);
+			worldObj.setBlock(pos.getX(), pos.getY(), pos.getZ(), comp.block, (int) comp.allowedMetas.toArray()[0], 3);
 		}
 	}
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int side) {
-		if(this.config == null) return new int[] { };
-		if(this.config.itemInCount > 5) return new int[] { 4, 5, 6, 7, 8, 9, 16, 17, 18, 19, 20, 21 };
-		if(this.config.itemInCount > 4) return new int[] { 4, 5, 6, 7, 8, 16, 17, 18, 19, 20, 21 };
-		if(this.config.itemInCount > 3) return new int[] { 4, 5, 6, 7, 16, 17, 18, 19, 20, 21 };
-		if(this.config.itemInCount > 2) return new int[] { 4, 5, 6, 16, 17, 18, 19, 20, 21 };
-		if(this.config.itemInCount > 1) return new int[] { 4, 5, 16, 17, 18, 19, 20, 21 };
-		if(this.config.itemInCount > 0) return new int[] { 4, 16, 17, 18, 19, 20, 21 };
+		if(this.config == null) return EMPTY_SLOTS;
+		if(this.config.itemInCount != cachedItemInCount || accessibleSlots == null) {
+			accessibleSlots = computeAccessibleSlots(this.config.itemInCount);
+			cachedItemInCount = this.config.itemInCount;
+		}
+		return accessibleSlots;
+	}
+
+	private int[] computeAccessibleSlots(int itemInCount) {
+		if(itemInCount > 5) return new int[] { 4, 5, 6, 7, 8, 9, 16, 17, 18, 19, 20, 21 };
+		if(itemInCount > 4) return new int[] { 4, 5, 6, 7, 8, 16, 17, 18, 19, 20, 21 };
+		if(itemInCount > 3) return new int[] { 4, 5, 6, 7, 16, 17, 18, 19, 20, 21 };
+		if(itemInCount > 2) return new int[] { 4, 5, 6, 16, 17, 18, 19, 20, 21 };
+		if(itemInCount > 1) return new int[] { 4, 5, 16, 17, 18, 19, 20, 21 };
+		if(itemInCount > 0) return new int[] { 4, 16, 17, 18, 19, 20, 21 };
 		return new int[] { 16, 17, 18, 19, 20, 21 };
 	}
 
@@ -689,6 +783,43 @@ public class TileEntityCustomMachine extends TileEntityMachinePolluting implemen
 			}
 			nbt.setIntArray("materials", matArray);
 		}
+	}
+	AxisAlignedBB bb = null;
+
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+
+		if(bb == null ) {
+
+			if(config!=null && config.customModel!=null){
+				bb = AxisAlignedBB.getBoundingBox(
+					xCoord + config.customModel.model_Bounding_x1,
+					yCoord + config.customModel.model_Bounding_y1,
+					zCoord + config.customModel.model_Bounding_z1,
+					xCoord + config.customModel.model_Bounding_x2,
+					yCoord + config.customModel.model_Bounding_y2,
+					zCoord + config.customModel.model_Bounding_z2
+				);
+			}
+			else {
+				bb = AxisAlignedBB.getBoundingBox(
+					xCoord,
+					yCoord,
+					zCoord,
+					xCoord,
+					yCoord,
+					zCoord
+				);
+			}
+		}
+
+		return bb;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public double getMaxRenderDistanceSquared() {
+		return 65536.0D;
 	}
 
 	@Override
