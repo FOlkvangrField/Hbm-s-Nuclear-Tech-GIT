@@ -1,6 +1,7 @@
 package com.hbm.main;
 
 import java.util.List;
+import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ICustomBlockHighlight;
 import com.hbm.config.ClientConfig;
 import com.hbm.config.RadiationConfig;
@@ -536,6 +537,16 @@ public class ModEventHandlerRenderer {
 	public void onDrawHighlight(DrawBlockHighlightEvent event) {
 
 		EntityPlayer player = MainRegistry.proxy.me();
+
+		if(player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemBlock) {
+			Block b = Block.getBlockFromItem(player.getHeldItem().getItem());
+			if(b instanceof BlockDummyable) {
+				((BlockDummyable) b).drawPlacementHighlight(player, event.partialTicks);
+				event.setCanceled(true);
+				return;
+			}
+		}
+
 		if(player.getHeldItem() != null && player.getHeldItem().getItem() == ModItems.gun_drill) {
 			XFactoryDrill.drawBlockHighlight(player, player.getHeldItem(), event.partialTicks);
 			event.setCanceled(true);
