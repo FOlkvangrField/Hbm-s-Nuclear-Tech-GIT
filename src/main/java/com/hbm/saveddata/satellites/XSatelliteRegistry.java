@@ -1,7 +1,6 @@
 package com.hbm.saveddata.satellites;
 
 import com.hbm.dim.SolarSystem;
-import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.items.ModItems;
 import com.hbm.saveddata.SatelliteSavedData;
 import net.minecraft.item.Item;
@@ -117,7 +116,7 @@ public class XSatelliteRegistry {
 	
 	public static SatelliteBase createFromItem(ItemStack stack) {
 		try {
-			return itemToClass.get(new ComparableStack(stack).makeSingular()).newInstance();
+			return itemToClass.get(stack.getItem()).newInstance();
 		} catch(Exception e) { }
 		return null;
 	}
