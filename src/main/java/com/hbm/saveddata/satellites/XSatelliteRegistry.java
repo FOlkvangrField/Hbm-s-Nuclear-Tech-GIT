@@ -1,5 +1,6 @@
 package com.hbm.saveddata.satellites;
 
+import com.google.common.collect.HashBiMap;
 import com.hbm.dim.SolarSystem;
 import com.hbm.items.ModItems;
 import com.hbm.saveddata.SatelliteSavedData;
@@ -8,15 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class XSatelliteRegistry {
 	
-	public static final List<Class<? extends SatelliteBase>> satellites = new ArrayList<>();
+	public static final HashBiMap<Integer, Class<? extends SatelliteBase>> idToClass = HashBiMap.create(20);
 	public static final HashMap<Item, Class<? extends SatelliteBase>> itemToClass = new HashMap<>();
 	private static final HashMap<Class<? extends SatelliteBase>, float[]> satelliteColors = new HashMap<>();
+
+	private static int currentId;
 	
 	public static void register() {
 
@@ -34,6 +35,8 @@ public class XSatelliteRegistry {
 		registerSatellite(SatelliteHorizons.class, ModItems.sat_gerald, 0.0F, 0.0F, 0.0F);
 		registerSatellite(SatelliteRailgun.class, ModItems.sat_war, 0.0F, 0.0F, 0.0F);
 		registerSatellite(SatellitePrecisionLaser.class, ModItems.sat_precision_laser, 0.221F, 1.0F, 0.663F);
+		registerSatellite(SatelliteDetector.class, ModItems.sat_detector, 0.1F, 0.2F, 0.3F);
+		registerSatellite(SatelliteRayScan.class, ModItems.sat_ray_scan, 0.1F, 0.2F, 0.3F);
 
 	}
 
@@ -44,7 +47,7 @@ public class XSatelliteRegistry {
 	 */
 	public static void registerSatellite(Class<? extends SatelliteBase> sat, Item item, float r, float g, float b) {
 		if(!itemToClass.containsKey(item) && !itemToClass.containsValue(sat)) {
-			satellites.add(sat);
+			idToClass.put(currentId++, sat);
 			itemToClass.put(item, sat);
 			satelliteColors.put(sat, new float[] { r, g, b });
 		}
@@ -70,39 +73,45 @@ public class XSatelliteRegistry {
 	public static void orbit(World world, ItemStack stack, int freq, double x, double y, double z) {
 		if(world.isRemote) return;
 
-		SatelliteBase sat = createFromItem(stack);
+		SatelliteSavedData data = SatelliteSavedData.getData(world, (int)x, (int)z);
+		SatelliteBase existing = data.sats.get(freq);
 		
-		if(sat != null) {
-			int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
-			if(world.provider.dimensionId != targetDimensionId) {
-				World targetWorld = DimensionManager.getWorld(targetDimensionId);
-				if(targetWorld == null) {
-					DimensionManager.initDimension(targetDimensionId);
-					targetWorld = DimensionManager.getWorld(targetDimensionId);
+		if(existing != null) {
+			existing.onPartDelivered(world, stack);
+		} else {
+			SatelliteBase sat = createFromItem(stack);
+			
+			if(sat != null) {
+				int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
+				if(world.provider.dimensionId != targetDimensionId) {
+					World targetWorld = DimensionManager.getWorld(targetDimensionId);
+					if(targetWorld == null) {
+						DimensionManager.initDimension(targetDimensionId);
+						targetWorld = DimensionManager.getWorld(targetDimensionId);
+					}
+					if(targetWorld != null) world = targetWorld;
 				}
-				if(targetWorld != null) world = targetWorld;
+
+				sat.inclination = SatelliteBase.getInclination(stack);
+				sat.altitude = SatelliteBase.getAltitude(stack);
+				sat.phaseOffset = SatelliteBase.getPhaseOffset(stack);
+				sat.isBlinking = SatelliteBase.isBlinking(stack);
+				sat.blinkPeriod = SatelliteBase.getBlinkPeriod(stack);
+				sat.owner = SatelliteBase.getOwner(stack);
+				sat.colorR = SatelliteBase.getColorR(stack);
+				sat.colorG = SatelliteBase.getColorG(stack);
+				sat.colorB = SatelliteBase.getColorB(stack);
+
+				data.sats.put(freq, sat);
+				sat.onOrbit(world, x, y, z);
+				data.markDirty();
 			}
-
-			sat.inclination = SatelliteBase.getInclination(stack);
-			sat.altitude = SatelliteBase.getAltitude(stack);
-			sat.phaseOffset = SatelliteBase.getPhaseOffset(stack);
-			sat.isBlinking = SatelliteBase.isBlinking(stack);
-			sat.blinkPeriod = SatelliteBase.getBlinkPeriod(stack);
-			sat.owner = SatelliteBase.getOwner(stack);
-			sat.colorR = SatelliteBase.getColorR(stack);
-			sat.colorG = SatelliteBase.getColorG(stack);
-			sat.colorB = SatelliteBase.getColorB(stack);
-
-			SatelliteSavedData data = SatelliteSavedData.getData(world, (int)x, (int)z);
-			data.sats.put(freq, sat);
-			sat.onOrbit(world, x, y, z);
-			data.markDirty();
 		}
 	}
 	
 	public static SatelliteBase createFromId(int i) {
 		try {
-			Class<? extends SatelliteBase> c = satellites.get(i);
+			Class<? extends SatelliteBase> c = idToClass.get(i);
 			SatelliteBase sat = c.newInstance();
 			float[] color = getRegisteredColor(c);
 			sat.colorR = color[0];

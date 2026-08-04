@@ -1151,13 +1151,13 @@ public class ModItems {
 	public static Item waste_schrabidium;
 	public static Item waste_zfb_mox;
 
-	public static Item waste_plate_u233;
-	public static Item waste_plate_u235;
-	public static Item waste_plate_mox;
-	public static Item waste_plate_pu239;
-	public static Item waste_plate_sa326;
-	public static Item waste_plate_ra226be;
-	public static Item waste_plate_pu238be;
+	@Deprecated public static Item waste_plate_u233;
+	@Deprecated public static Item waste_plate_u235;
+	@Deprecated public static Item waste_plate_mox;
+	@Deprecated public static Item waste_plate_pu239;
+	@Deprecated public static Item waste_plate_sa326;
+	@Deprecated public static Item waste_plate_ra226be;
+	@Deprecated public static Item waste_plate_pu238be;
 
 	@Deprecated public static Item pile_rod_uranium;
 	@Deprecated public static Item pile_rod_pu239;
@@ -1169,13 +1169,13 @@ public class ModItems {
 
 	public static Item pile_rod;
 
-	public static Item plate_fuel_u233;
-	public static Item plate_fuel_u235;
-	public static Item plate_fuel_mox;
-	public static Item plate_fuel_pu239;
-	public static Item plate_fuel_sa326;
-	public static Item plate_fuel_ra226be;
-	public static Item plate_fuel_pu238be;
+	@Deprecated public static Item plate_fuel_u233;
+	@Deprecated public static Item plate_fuel_u235;
+	@Deprecated public static Item plate_fuel_mox;
+	@Deprecated public static Item plate_fuel_pu239;
+	@Deprecated public static Item plate_fuel_sa326;
+	@Deprecated public static Item plate_fuel_ra226be;
+	@Deprecated public static Item plate_fuel_pu238be;
 
 	public static Item pwr_fuel;
 	public static Item pwr_fuel_hot;
@@ -1571,6 +1571,8 @@ public class ModItems {
 	public static Item sat_dyson_relay;
 	public static Item sat_war;
 	public static Item sat_precision_laser;
+	public static Item sat_detector;
+	public static Item sat_ray_scan;
 
 	public static Item sat_coord;
 	public static Item sat_designator;
@@ -3402,13 +3404,13 @@ public class ModItems {
 		
 		pile_rod = new ItemPileRodMK2().setUnlocalizedName("pile_rod").setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":pile_rod");
 
-		plate_fuel_u233 = new ItemPlateFuel(2200000).setFunction(FunctionEnum.SQUARE_ROOT, 50).setUnlocalizedName("plate_fuel_u233").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_u233");
-		plate_fuel_u235 = new ItemPlateFuel(2200000).setFunction(FunctionEnum.SQUARE_ROOT, 40).setUnlocalizedName("plate_fuel_u235").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_u235");
-		plate_fuel_mox = new ItemPlateFuel(2400000).setFunction(FunctionEnum.LOGARITHM, 50).setUnlocalizedName("plate_fuel_mox").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_mox");
-		plate_fuel_pu239 = new ItemPlateFuel(2000000).setFunction(FunctionEnum.NEGATIVE_QUADRATIC, 50).setUnlocalizedName("plate_fuel_pu239").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_pu239");
-		plate_fuel_sa326 = new ItemPlateFuel(2000000).setFunction(FunctionEnum.LINEAR, 80).setUnlocalizedName("plate_fuel_sa326").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_sa326");
-		plate_fuel_ra226be = new ItemPlateFuel(1300000).setFunction(FunctionEnum.PASSIVE, 30).setUnlocalizedName("plate_fuel_ra226be").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_ra226be");
-		plate_fuel_pu238be = new ItemPlateFuel(1000000).setFunction(FunctionEnum.PASSIVE, 50).setUnlocalizedName("plate_fuel_pu238be").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":plate_fuel_pu238be");
+		plate_fuel_u233 = new ItemPlateFuel(2200000).setFunction(FunctionEnum.SQUARE_ROOT, 50).setUnlocalizedName("plate_fuel_u233").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_u233");
+		plate_fuel_u235 = new ItemPlateFuel(2200000).setFunction(FunctionEnum.SQUARE_ROOT, 40).setUnlocalizedName("plate_fuel_u235").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_u235");
+		plate_fuel_mox = new ItemPlateFuel(2400000).setFunction(FunctionEnum.LOGARITHM, 50).setUnlocalizedName("plate_fuel_mox").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_mox");
+		plate_fuel_pu239 = new ItemPlateFuel(2000000).setFunction(FunctionEnum.NEGATIVE_QUADRATIC, 50).setUnlocalizedName("plate_fuel_pu239").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_pu239");
+		plate_fuel_sa326 = new ItemPlateFuel(2000000).setFunction(FunctionEnum.LINEAR, 80).setUnlocalizedName("plate_fuel_sa326").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_sa326");
+		plate_fuel_ra226be = new ItemPlateFuel(1300000).setFunction(FunctionEnum.PASSIVE, 30).setUnlocalizedName("plate_fuel_ra226be").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_ra226be");
+		plate_fuel_pu238be = new ItemPlateFuel(1000000).setFunction(FunctionEnum.PASSIVE, 50).setUnlocalizedName("plate_fuel_pu238be").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":plate_fuel_pu238be");
 
 		pwr_fuel = new ItemPWRFuel().setUnlocalizedName("pwr_fuel").setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":pwr_fuel");
 		pwr_fuel_hot = new ItemEnumMulti(EnumPWRFuel.class, true, false).setUnlocalizedName("pwr_fuel_hot").setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":pwr_fuel_hot");
@@ -3877,6 +3879,8 @@ public class ModItems {
 		sat_dyson_relay = new ItemSatellite(32_000).setUnlocalizedName("sat_dyson_relay").setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_dyson_relay");
 		sat_war = new ItemSatellite(128_000).setUnlocalizedName("sat_war").setMaxStackSize(1).setCreativeTab(null).setTextureName(RefStrings.MODID + ":sat_gerald");
 		sat_precision_laser = new ItemSatellite(42_000).setUnlocalizedName("sat_precision_laser").setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_precision_laser");
+		sat_detector = new ItemSatellite(24_000).setUnlocalizedName("sat_detector").setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_detector");
+		sat_ray_scan = new ItemSatellite(34_000).setUnlocalizedName("sat_ray_scan").setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_ray_scan");
 
 		sat_coord = new ItemSatInterface().setUnlocalizedName("sat_coord").setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_coord");
 		sat_designator = new ItemSatDesignator().setUnlocalizedName("sat_designator").setFull3D().setMaxStackSize(1).setCreativeTab(MainRegistry.missileTab).setTextureName(RefStrings.MODID + ":sat_designator");
@@ -6351,6 +6355,8 @@ public class ModItems {
 		GameRegistry.registerItem(sat_lunar_miner, sat_lunar_miner.getUnlocalizedName());
 		GameRegistry.registerItem(sat_gerald, sat_gerald.getUnlocalizedName());
 		GameRegistry.registerItem(sat_precision_laser, sat_precision_laser.getUnlocalizedName());
+		GameRegistry.registerItem(sat_detector, sat_detector.getUnlocalizedName());
+		GameRegistry.registerItem(sat_ray_scan, sat_ray_scan.getUnlocalizedName());
 
 		GameRegistry.registerItem(sat_dyson_relay, sat_dyson_relay.getUnlocalizedName());
 		GameRegistry.registerItem(sat_war, sat_war.getUnlocalizedName());

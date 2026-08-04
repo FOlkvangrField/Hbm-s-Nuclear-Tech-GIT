@@ -42,7 +42,6 @@ public abstract class SatelliteBase {
 
 	private static final ResourceLocation satelliteTexture = new ResourceLocation(RefStrings.MODID, "textures/misc/space/satellite.png");
 	
-	public int range = 1_000;
 	public int targetX;
 	public int targetZ;
 	
@@ -64,7 +63,7 @@ public abstract class SatelliteBase {
 	public int health;
 	
 	public int getID() {
-		return XSatelliteRegistry.satellites.indexOf(this.getClass());
+		return XSatelliteRegistry.idToClass.inverse().get(this.getClass());
 	}
 	
 	public abstract String getType();
@@ -126,11 +125,15 @@ public abstract class SatelliteBase {
 		blinkPeriod = clampBlinkPeriod(buf.readFloat());
 	}
 	
+	/** When a satellite is created, i.e. this frequency is occupied for the first time */
 	public void onOrbit(World world, double x, double y, double z) {
 		setTarget((int) Math.floor(x), (int) Math.floor(z));
 		
 		RTTYSystem.broadcast(world, CHAN_SATLINK, "Established connection to " + getType() + " at " + targetX + " / " + targetZ);
 	}
+	
+	/** For subsequent items sent under the same frequency as an existing satellite */
+	public void onPartDelivered(World world, ItemStack part) { }
 	
 	public void onCommand(World world, String... cmd) {
 		onCommandTarget(world, cmd);

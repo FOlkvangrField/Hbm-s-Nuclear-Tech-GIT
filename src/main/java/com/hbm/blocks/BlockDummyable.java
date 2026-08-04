@@ -81,12 +81,27 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		overrideTileMeta = 0;
 	}
 
+	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-
 		super.onNeighborBlockChange(world, x, y, z, block);
 
-		if(safeRem)
-			return;
+		if(safeRem) return;
+
+		if(!internalPlayers.isEmpty()) {
+			boolean anyStillInside = false;
+			for(EntityPlayer player : internalPlayers) {
+				if(isPlayerInside(world, player)) {
+					anyStillInside = true;
+					break;
+				}
+			}
+
+			if(anyStillInside) {
+				world.scheduleBlockUpdate(x, y, z, this, 1);
+			} else {
+				internalPlayers.clear();
+			}
+		}
 
 		destroyIfOrphan(world, x, y, z);
 	}
@@ -110,13 +125,10 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 				internalPlayers.clear();
 			}
 		}
-
-		destroyIfOrphan(world, x, y, z);
 	}
 
 	private void destroyIfOrphan(World world, int x, int y, int z) {
-		if(world.isRemote)
-			return;
+		if(world.isRemote) return;
 
 		int metadata = world.getBlockMetadata(x, y, z);
 
@@ -420,20 +432,9 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 		super.breakBlock(world, x, y, z, b, i);
 	}
 
-	@Override
-	public int getRenderType() {
-		return -1;
-	}
-
-	@Override
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+	@Override public int getRenderType() { return -1; }
+	@Override public boolean isOpaqueCube() { return false; }
+	@Override public boolean renderAsNormalBlock() { return false; }
 
 	/**
 	 * @returns an int array with six fields, describing the amount of dummy blocks in each direction around the core. order is UP, DOWN, FORWARD, BACKWARD, LEFT, RIGHT
