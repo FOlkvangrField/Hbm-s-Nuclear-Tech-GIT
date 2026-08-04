@@ -23,7 +23,6 @@ import com.hbm.main.MainRegistry;
 import com.hbm.potion.HbmPotion;
 import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.saveddata.TomSaveData;
-import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.saveddata.satellites.SatelliteBase;
 import com.hbm.saveddata.satellites.XSatelliteRegistry;
 

@@ -31,7 +31,6 @@ import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.render.shader.Shader;
 import com.hbm.render.util.AtmosphereRenderUtil;
 import com.hbm.saveddata.SatelliteSavedData;
-import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.saveddata.satellites.SatelliteBase;
 import com.hbm.saveddata.satellites.SatelliteMapper;
 import com.hbm.saveddata.satellites.SatelliteMiner;
@@ -61,7 +60,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	private static final ResourceLocation ringTexture = new ResourceLocation(RefStrings.MODID + ":textures/misc/space/rings.png");
 	private static final ResourceLocation impactTexture = new ResourceLocation(RefStrings.MODID + ":textures/misc/space/impact.png");
 	private static final ResourceLocation defaultMask = new ResourceLocation(RefStrings.MODID, "textures/misc/space/default_mask.png");
-	private static final ResourceLocation satelliteTextureDefault = new ResourceLocation(RefStrings.MODID, "textures/items/sat_base.png");
+	private static final ResourceLocation satelliteTextureDefault = new ResourceLocation(RefStrings.MODID, "textures/items/sat_scanner.png");
 	// private static final ResourceLocation satelliteTextureFoeq = new ResourceLocation(RefStrings.MODID, "textures/items/sat_foeq.png");
 	// private static final ResourceLocation satelliteTextureLaser = new ResourceLocation(RefStrings.MODID, "textures/items/sat_laser.png");
 	// private static final ResourceLocation satelliteTextureMapper = new ResourceLocation(RefStrings.MODID, "textures/items/sat_mapper.png");
@@ -69,7 +68,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	// private static final ResourceLocation satelliteTextureRadar = new ResourceLocation(RefStrings.MODID, "textures/items/sat_radar.png");
 	// private static final ResourceLocation satelliteTextureResonator = new ResourceLocation(RefStrings.MODID, "textures/items/sat_resonator.png");
 	// private static final ResourceLocation satelliteTextureScanner = new ResourceLocation(RefStrings.MODID, "textures/items/sat_scanner.png");
-	private static final Map<Class<?>, ResourceLocation> satelliteTextureByClass = new HashMap<Class<?>, ResourceLocation>();
+	// private static final Map<Class<?>, ResourceLocation> satelliteTextureByClass = new HashMap<Class<?>, ResourceLocation>();
 	private static final ResourceLocation[] citylights = new ResourceLocation[]{
 		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_0.png"),
 		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_1.png"),
@@ -83,15 +82,15 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	private static final Shader nukeShader = new Shader(new ResourceLocation(RefStrings.MODID, "shaders/nuke.frag"));
 	private static final Shader nightLightsShader = new Shader(new ResourceLocation(RefStrings.MODID, "shaders/nightlights.frag"));
 
-	static {
-		// satelliteTextureByClass.put(SatelliteMapper.class, satelliteTextureMapper);
-		// satelliteTextureByClass.put(SatelliteScanner.class, satelliteTextureScanner);
-		// satelliteTextureByClass.put(SatelliteRadar.class, satelliteTextureRadar);
-		// satelliteTextureByClass.put(SatelliteLaser.class, satelliteTextureLaser);
-		// satelliteTextureByClass.put(SatelliteResonator.class, satelliteTextureResonator);
-		// satelliteTextureByClass.put(SatelliteFoeq.class, satelliteTextureFoeq);
-		// satelliteTextureByClass.put(SatelliteMiner.class, satelliteTextureMiner);
-	}
+	// static {
+	// 	satelliteTextureByClass.put(SatelliteMapper.class, satelliteTextureMapper);
+	// 	satelliteTextureByClass.put(SatelliteScanner.class, satelliteTextureScanner);
+	// 	satelliteTextureByClass.put(SatelliteRadar.class, satelliteTextureRadar);
+	// 	satelliteTextureByClass.put(SatelliteLaser.class, satelliteTextureLaser);
+	// 	satelliteTextureByClass.put(SatelliteResonator.class, satelliteTextureResonator);
+	// 	satelliteTextureByClass.put(SatelliteFoeq.class, satelliteTextureFoeq);
+	// 	satelliteTextureByClass.put(SatelliteMiner.class, satelliteTextureMiner);
+	// }
 
 	private static final int MAP_X = 9;
 	private static final int MAP_Y = 9;
@@ -746,7 +745,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				continue;
 			}
 
-			float satelliteAngle = Satellite.applyPhaseOffsetToOrbitAngle(satellite.phaseOffset, satellite.altitude, angle, (float) (2D * Math.PI));
+			float satelliteAngle = SatelliteBase.applyPhaseOffsetToOrbitAngle(satellite.phaseOffset, satellite.altitude, angle, (float) (2D * Math.PI));
 			SatelliteOrbitPoint orbitPoint = getArtificialSatelliteOrbitPoint(satellite, satelliteAngle, baseOrbitRadiusMapPx);
 			float screenX = mapToScreenX(bodyMapU + orbitPoint.offsetU, bodyMapV + orbitPoint.offsetV);
 			float screenY = mapToScreenY(bodyMapU + orbitPoint.offsetU, bodyMapV + orbitPoint.offsetV);
@@ -758,7 +757,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 				continue;
 			}
 
-			mc.getTextureManager().bindTexture(getArtificialSatelliteTexture(satellite));
+			mc.getTextureManager().bindTexture(satelliteTextureDefault);
 			drawPartialTex(screenX - iconHalf, screenY - iconHalf, iconSize, iconSize, 0F, 0F, 1F, 1F);
 
 			SatelliteRenderInfo renderInfo = new SatelliteRenderInfo(frequency.intValue(), satellite, bodyMapU + orbitPoint.offsetU, bodyMapV + orbitPoint.offsetV, iconSize);
@@ -879,18 +878,18 @@ public class GUIMachineStardar extends GuiInfoContainer {
 		return -progress * 2D * Math.PI;
 	}
 
-	private ResourceLocation getArtificialSatelliteTexture(SatelliteBase satellite) {
-		for(Class<?> type = satellite != null ? satellite.getClass() : null; type != null; type = type.getSuperclass()) {
-			ResourceLocation texture = satelliteTextureByClass.get(type);
-			if(texture != null) {
-				return texture;
-			}
-			if(type == Satellite.class) {
-				break;
-			}
-		}
-		return satelliteTextureDefault;
-	}
+	// private ResourceLocation getArtificialSatelliteTexture(SatelliteBase satellite) {
+	// 	for(Class<?> type = satellite != null ? satellite.getClass() : null; type != null; type = type.getSuperclass()) {
+	// 		ResourceLocation texture = satelliteTextureByClass.get(type);
+	// 		if(texture != null) {
+	// 			return texture;
+	// 		}
+	// 		if(type == SatelliteBase.class) {
+	// 			break;
+	// 		}
+	// 	}
+	// 	return satelliteTextureDefault;
+	// }
 
 	private void drawQueuedBodyLabels() {
 		if(renderedBodyLabels.isEmpty() || this.fontRendererObj == null) {
@@ -2007,7 +2006,7 @@ public class GUIMachineStardar extends GuiInfoContainer {
 		}
 
 		SatelliteBase satellite = satelliteInfo.satellite;
-		String owner = satellite.owner != null && !satellite.owner.isEmpty() ? satellite.owner : Satellite.DEFAULT_OWNER;
+		String owner = satellite.owner != null && !satellite.owner.isEmpty() ? satellite.owner : SatelliteBase.DEFAULT_OWNER;
 		List<String> tooltip = new ArrayList<String>(5);
 		tooltip.add(EnumChatFormatting.YELLOW + I18nUtil.resolveKey("item.sat.desc.owner") + ": " + EnumChatFormatting.GOLD + owner);
 		tooltip.add(EnumChatFormatting.YELLOW + I18nUtil.resolveKey("item.sat.desc.speed") + ": " + EnumChatFormatting.GOLD + formatOrbitSpeed(satellite.altitude) + I18nUtil.resolveKey("gui.sat.settings.unit.km_per_second"));
@@ -2495,11 +2494,11 @@ public class GUIMachineStardar extends GuiInfoContainer {
 	}
 
 	private static String formatOrbitSpeed(float altitude) {
-		return formatValue(Math.round(Satellite.getOrbitSpeedKmPerSecond(altitude) * 10.0F) / 10.0F);
+		return formatValue(Math.round(SatelliteBase.getOrbitSpeedKmPerSecond(altitude) * 10.0F) / 10.0F);
 	}
 
 	private static String formatPhaseOffset(float phaseOffset) {
-		float rounded = Math.round(Satellite.normalizePhaseOffset(phaseOffset) * 10.0F) / 10.0F;
+		float rounded = Math.round(SatelliteBase.normalizePhaseOffset(phaseOffset) * 10.0F) / 10.0F;
 		return formatValue(rounded);
 	}
 

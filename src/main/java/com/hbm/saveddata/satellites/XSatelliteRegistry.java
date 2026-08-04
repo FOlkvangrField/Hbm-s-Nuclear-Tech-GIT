@@ -1,11 +1,13 @@
 package com.hbm.saveddata.satellites;
 
+import com.hbm.dim.SolarSystem;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.items.ModItems;
 import com.hbm.saveddata.SatelliteSavedData;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +50,23 @@ public class XSatelliteRegistry {
 			satelliteColors.put(sat, new float[] { r, g, b });
 		}
 	}
+
+	public static boolean isSatelliteItem(Item item) {
+		return itemToClass.containsKey(item);
+	}
+
+	public static int getTargetDimensionId(Class<? extends SatelliteBase> satelliteClass, int fallbackDimensionId) {
+		if(satelliteClass == null) return fallbackDimensionId;
+		if(SatelliteRelay.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.DUNA.getDimensionId();
+		if(SatelliteLunarMiner.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.MUN.getDimensionId();
+		if(SatelliteMiner.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.DRES.getDimensionId();
+		return fallbackDimensionId;
+	}
+
+	public static int getTargetDimensionId(ItemStack stack, int fallbackDimensionId) {
+		if(stack == null || stack.getItem() == null) return fallbackDimensionId;
+		return getTargetDimensionId(itemToClass.get(stack.getItem()), fallbackDimensionId);
+	}
 	
 	public static void orbit(World world, ItemStack stack, int freq, double x, double y, double z) {
 		if(world.isRemote) return;
@@ -55,6 +74,26 @@ public class XSatelliteRegistry {
 		SatelliteBase sat = createFromItem(stack);
 		
 		if(sat != null) {
+			int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
+			if(world.provider.dimensionId != targetDimensionId) {
+				World targetWorld = DimensionManager.getWorld(targetDimensionId);
+				if(targetWorld == null) {
+					DimensionManager.initDimension(targetDimensionId);
+					targetWorld = DimensionManager.getWorld(targetDimensionId);
+				}
+				if(targetWorld != null) world = targetWorld;
+			}
+
+			sat.inclination = SatelliteBase.getInclination(stack);
+			sat.altitude = SatelliteBase.getAltitude(stack);
+			sat.phaseOffset = SatelliteBase.getPhaseOffset(stack);
+			sat.isBlinking = SatelliteBase.isBlinking(stack);
+			sat.blinkPeriod = SatelliteBase.getBlinkPeriod(stack);
+			sat.owner = SatelliteBase.getOwner(stack);
+			sat.colorR = SatelliteBase.getColorR(stack);
+			sat.colorG = SatelliteBase.getColorG(stack);
+			sat.colorB = SatelliteBase.getColorB(stack);
+
 			SatelliteSavedData data = SatelliteSavedData.getData(world, (int)x, (int)z);
 			data.sats.put(freq, sat);
 			sat.onOrbit(world, x, y, z);
@@ -64,7 +103,14 @@ public class XSatelliteRegistry {
 	
 	public static SatelliteBase createFromId(int i) {
 		try {
-			return satellites.get(i).newInstance();
+			Class<? extends SatelliteBase> c = satellites.get(i);
+			SatelliteBase sat = c.newInstance();
+			float[] color = getRegisteredColor(c);
+			sat.colorR = color[0];
+			sat.colorG = color[1];
+			sat.colorB = color[2];
+
+			return sat;
 		} catch(Exception e) { }
 		return null;
 	}
@@ -92,5 +138,7 @@ public class XSatelliteRegistry {
 		}
 		return color;
 	}
+
+	
 
 }

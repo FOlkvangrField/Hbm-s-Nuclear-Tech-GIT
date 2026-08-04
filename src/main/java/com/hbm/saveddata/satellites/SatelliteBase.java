@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -262,6 +263,115 @@ public abstract class SatelliteBase {
 
 
 	
+
+	public static void copyItemData(ItemStack from, ItemStack to) {
+		if(to == null) return;
+		setInclination(to, getInclination(from));
+		setAltitude(to, getAltitude(from));
+		setPhaseOffset(to, getPhaseOffset(from));
+		setOwner(to, getOwner(from));
+		setColor(to, getColorR(from), getColorG(from), getColorB(from));
+		setBlinking(to, isBlinking(from));
+		setBlinkPeriod(to, getBlinkPeriod(from));
+	}
+
+	public static void ensureItemData(ItemStack stack) {
+		getItemData(stack);
+	}
+
+	public static NBTTagCompound getItemData(ItemStack stack) {
+		NBTTagCompound nbt = stack.stackTagCompound;
+		if(nbt == null) {
+			nbt = new NBTTagCompound();
+			float[] color = XSatelliteRegistry.getRegisteredColor(stack.getItem());
+			nbt.setFloat("satInclination", DEFAULT_INCLINATION);
+			nbt.setFloat("satAltitude", DEFAULT_ALTITUDE_KM);
+			nbt.setFloat("satPhaseOffset", DEFAULT_PHASE_OFFSET);
+			nbt.setBoolean("satIsBlinking", DEFAULT_IS_BLINKING);
+			nbt.setFloat("satBlink", DEFAULT_BLINK_PERIOD);
+			nbt.setString("satOwner", DEFAULT_OWNER);
+			nbt.setFloat("satColorR", color[0]);
+			nbt.setFloat("satColorG", color[1]);
+			nbt.setFloat("satColorB", color[2]);
+			stack.stackTagCompound = nbt;
+		} else {
+			nbt.setFloat("satInclination", nbt.hasKey("satInclination") ? nbt.getFloat("satInclination") : DEFAULT_INCLINATION);
+			nbt.setFloat("satPhaseOffset", nbt.hasKey("satPhaseOffset") ? normalizePhaseOffset(nbt.getFloat("satPhaseOffset")) : DEFAULT_PHASE_OFFSET);
+			if(!nbt.hasKey("satIsBlinking")) {
+				nbt.setBoolean("satIsBlinking", DEFAULT_IS_BLINKING);
+			}
+			nbt.setFloat("satBlink", nbt.hasKey("satBlink") ? clampBlinkPeriod(nbt.getFloat("satBlink")) : DEFAULT_BLINK_PERIOD);
+		}
+
+		return nbt;
+	}
+
+	public static float getInclination(ItemStack stack) {
+		return getItemData(stack).getFloat("satInclination");
+	}
+
+	public static float getAltitude(ItemStack stack) {
+		return getItemData(stack).getFloat("satAltitude");
+	}
+
+	public static float getPhaseOffset(ItemStack stack) {
+		return getItemData(stack).getFloat("satPhaseOffset");
+	}
+
+	public static String getOwner(ItemStack stack) {
+		return getItemData(stack).getString("satOwner");
+	}
+
+	public static float getColorR(ItemStack stack) {
+		return getItemData(stack).getFloat("satColorR");
+	}
+
+	public static float getColorG(ItemStack stack) {
+		return getItemData(stack).getFloat("satColorG");
+	}
+
+	public static float getColorB(ItemStack stack) {
+		return getItemData(stack).getFloat("satColorB");
+	}
+
+	public static float getBlinkPeriod(ItemStack stack) {
+		return getItemData(stack).getFloat("satBlink");
+	}
+
+	public static boolean isBlinking(ItemStack stack) {
+		return getItemData(stack).getBoolean("satIsBlinking");
+	}
+
+	public static void setInclination(ItemStack stack, float inclination) {
+		getItemData(stack).setFloat("satInclination", inclination);
+	}
+
+	public static void setAltitude(ItemStack stack, float altitude) {
+		getItemData(stack).setFloat("satAltitude", altitude);
+	}
+
+	public static void setPhaseOffset(ItemStack stack, float phaseOffset) {
+		getItemData(stack).setFloat("satPhaseOffset", normalizePhaseOffset(phaseOffset));
+	}
+
+	public static void setOwner(ItemStack stack, String owner) {
+		getItemData(stack).setString("satOwner", owner);
+	}
+
+	public static void setColor(ItemStack stack, float r, float g, float b) {
+		NBTTagCompound nbt = getItemData(stack);
+		nbt.setFloat("satColorR", r);
+		nbt.setFloat("satColorG", g);
+		nbt.setFloat("satColorB", b);
+	}
+
+	public static void setBlinking(ItemStack stack, boolean isBlinking) {
+		getItemData(stack).setBoolean("satIsBlinking", isBlinking);
+	}
+
+	public static void setBlinkPeriod(ItemStack stack, float blinkPeriod) {
+		getItemData(stack).setFloat("satBlink", clampBlinkPeriod(blinkPeriod));
+	}
 
 	public static float clampBlinkPeriod(float blinkPeriod) {
 		return Math.max(MIN_BLINK_PERIOD, Math.min(MAX_BLINK_PERIOD, blinkPeriod));
