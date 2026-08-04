@@ -49,7 +49,6 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 
 	public BlockDummyable(Material mat) {
 		super(mat);
-		this.setTickRandomly(true);
 	}
 
 	/// BLOCK METADATA ///
@@ -674,24 +673,47 @@ public abstract class BlockDummyable extends BlockContainer implements ICustomBl
 			double dZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double) interp;
 
 			int i = MathHelper.floor_double(player.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-			int o = -getOffset();
-			int pY = mop.blockY + getHeightOffset();
 
-			// Orientation
+			ForgeDirection placedSide = ForgeDirection.getOrientation(mop.sideHit);
+			int x = mop.blockX + placedSide.offsetX;
+			int y = mop.blockY + placedSide.offsetY;
+			int z = mop.blockZ + placedSide.offsetZ;
+			
+
+			// The direction the player is facing, for offsetting the block away from the player
 			ForgeDirection facing = ForgeDirection.NORTH;
-			if(i == 0) facing = ForgeDirection.getOrientation(2);
-			if(i == 1) facing = ForgeDirection.getOrientation(5);
-			if(i == 2) facing = ForgeDirection.getOrientation(3);
-			if(i == 3) facing = ForgeDirection.getOrientation(4);
 
-			ForgeDirection sideHit = ForgeDirection.getOrientation(mop.sideHit);
-			facing = getDirModified(facing);
+			if(placedSide == ForgeDirection.UP || placedSide == ForgeDirection.DOWN) {
+				if(i == 0) facing = ForgeDirection.getOrientation(2);
+				if(i == 1) facing = ForgeDirection.getOrientation(5);
+				if(i == 2) facing = ForgeDirection.getOrientation(3);
+				if(i == 3) facing = ForgeDirection.getOrientation(4);
+			} else {
+				facing = placedSide;
+			}
 
-			double originX = mop.blockX + facing.offsetX * o + sideHit.offsetX;
-			double originY = pY + sideHit.offsetY;
-			double originZ = mop.blockZ + facing.offsetZ * o + sideHit.offsetZ;
+			// The direction the final multiblock will be facing
+			ForgeDirection dir = getDirModified(facing);
 
-			boolean canPlace = checkRequirement(player.worldObj, mop.blockX + sideHit.offsetX, pY + sideHit.offsetY, mop.blockZ + sideHit.offsetZ, facing, o);
+			int o = -getOffset();
+
+			int originX = x + facing.offsetX * o;
+			int originY = y + getHeightOffset();
+			int originZ = z + facing.offsetZ * o;
+
+			// Modify offsets to handle differing rotations and placing blocks on walls
+			if(placedSide == ForgeDirection.DOWN) {
+				int[] dim = getDimensions();
+				originY -= dim[0] + dim[1];
+			} else if(placedSide != ForgeDirection.UP) {
+				int[] rotDim = MultiblockHandlerXR.rotate(getDimensions(), dir);
+				if(rotDim != null) {
+					originX = x + placedSide.offsetX * rotDim[placedSide.getOpposite().ordinal()];
+					originZ = z + placedSide.offsetZ * rotDim[placedSide.getOpposite().ordinal()];
+				}
+			}
+
+			boolean canPlace = checkRequirement(player.worldObj, originX - dir.offsetX * o, originY, originZ - dir.offsetZ * o, dir, o);
 			Tessellator tess = Tessellator.instance;
 
 			GL11.glPushMatrix();
