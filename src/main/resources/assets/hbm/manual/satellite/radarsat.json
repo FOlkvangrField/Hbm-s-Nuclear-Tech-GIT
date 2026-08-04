@@ -1,7 +1,7 @@
 {
 	"name": "Radar Satellite",
-	"icon": ["hbm:item.satellite", 1, 2],
-	"trigger": [["hbm:item.satellite", 1, 2]],
+	"icon": ["hbm:item.sat_radar", 1, 0],
+	"trigger": [["hbm:item.sat_radar", 1, 0]],
 	"title": {
 		"en_US": "Radar Satellite"
 	},

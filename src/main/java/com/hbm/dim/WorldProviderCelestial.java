@@ -23,6 +23,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.main.MainRegistry;
 import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.saveddata.satellites.Satellite;
+import com.hbm.saveddata.satellites.SatelliteBase;
 import com.hbm.saveddata.satellites.SatelliteWar;
 import com.hbm.util.Compat;
 
@@ -388,18 +389,6 @@ public abstract class WorldProviderCelestial extends WorldProviderSurface {
 		CBT_Atmosphere atmosphere = CelestialBody.getTrait(worldObj, CBT_Atmosphere.class);
 		Vec3 color = Vec3.createVectorHelper(0, 0, 0);
 
-		for(Map.Entry<Integer, Satellite> entry : SatelliteSavedData.getClientSats().entrySet()) {
-			if(entry instanceof SatelliteWar) {
-				SatelliteWar war = (SatelliteWar) entry.getValue();
-				float flame = war.interp;
-				float alpd = 1.0F - Math.min(1.0F, flame / 100);
-
-				color.xCoord += alpd * 1.5;
-				color.yCoord += alpd * 1.5;
-				color.zCoord += alpd * 1.5;
-			}
-		}
-
 		// The cold hard vacuum of space
 		if(atmosphere == null) {
 			return color;
@@ -436,29 +425,16 @@ public abstract class WorldProviderCelestial extends WorldProviderSurface {
 
 		if(CelestialBody.getBody(worldObj).hasTrait(CBT_War.class)) {
 			CBT_War wardat = CelestialBody.getTrait(worldObj, CBT_War.class);
-				for(int i = 0; i < wardat.getProjectiles().size(); i++) {
-					CBT_War.Projectile projectile = wardat.getProjectiles().get(i);
-					float flash = projectile.getFlashtime();
-					if(projectile.getAnimtime() > 0) {
-						float invertedFlash = 100 - flash;
+			for(int i = 0; i < wardat.getProjectiles().size(); i++) {
+				CBT_War.Projectile projectile = wardat.getProjectiles().get(i);
+				float flash = projectile.getFlashtime();
+				if(projectile.getAnimtime() > 0) {
+					float invertedFlash = 100 - flash;
 
-						color.xCoord += invertedFlash * 0.5;
-						color.yCoord += invertedFlash * 0.5;
-						color.zCoord += invertedFlash * 0.5;
-					}
+					color.xCoord += invertedFlash * 0.5;
+					color.yCoord += invertedFlash * 0.5;
+					color.zCoord += invertedFlash * 0.5;
 				}
-			}
-
-
-		for(Map.Entry<Integer, Satellite> entry : SatelliteSavedData.getClientSats().entrySet()) {
-			if(entry instanceof SatelliteWar) {
-				SatelliteWar war = (SatelliteWar) entry.getValue();
-				float flame = war.interp;
-				float alpd = 1.0F - Math.min(1.0F, flame / 100);
-
-				color.xCoord += alpd * 1.5;
-				color.yCoord += alpd * 1.5;
-				color.zCoord += alpd * 1.5;
 			}
 		}
 
@@ -649,15 +625,6 @@ public abstract class WorldProviderCelestial extends WorldProviderSurface {
 
 		// brightness _inside_ of the atmosphere, from effects like lightning or war weapons
 		float insideBrightness = 0;
-
-		for(Map.Entry<Integer, Satellite> entry : SatelliteSavedData.getClientSats().entrySet()) {
-			if(entry instanceof SatelliteWar) {
-				SatelliteWar war = (SatelliteWar) entry.getValue();
-				float flame = war.interp;
-				float alpd = 1.0F - Math.min(1.0F, flame / 100);
-				insideBrightness += alpd;
-			}
-		}
 
 		if(CelestialBody.getBody(worldObj).hasTrait(CBT_War.class)) {
 			CBT_War wardat = CelestialBody.getTrait(worldObj, CBT_War.class);

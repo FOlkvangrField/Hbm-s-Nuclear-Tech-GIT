@@ -84,17 +84,17 @@ public abstract class Satellite {
 	public float health;
 
 	public static void register() {
-		registerSatellite(SatelliteMapper.class, ModItems.sat_mapper, 0.538F, 1.0F, 0.523F);
-		registerSatellite(SatelliteScanner.class, ModItems.sat_scanner, 0.544F, 0.680F, 1.0F);
-		registerSatellite(SatelliteRadar.class, ModItems.sat_radar, 0.134F, 1.0F, 0.134F);
-		registerSatellite(SatelliteLaser.class, ModItems.sat_laser, 0.221F, 0.663F, 1.0F);
-		registerSatellite(SatelliteResonator.class, ModItems.sat_resonator, 1.0F, 0.646F, 0.181F);
-		registerSatellite(SatelliteFoeq.class, ModItems.sat_foeq, 1.0F, 0.15F, 0.15F);
-		registerSatellite(SatelliteMiner.class, ModItems.sat_miner, 0.46F, 0.56F, 0.68F);
-		registerSatellite(SatelliteLunarMiner.class, ModItems.sat_lunar_miner, 0.42F, 0.54F, 0.82F);
-		registerSatellite(SatelliteDysonRelay.class, ModItems.sat_dyson_relay, 1.0F, 0.9F, 0.8F);
-		registerSatellite(SatelliteHorizons.class, ModItems.sat_gerald, 0.0F, 0.0F, 0.0F);
-		registerSatellite(SatelliteRailgun.class, ModItems.sat_war, 0.0F, 0.0F, 0.0F);
+		// registerSatellite(SatelliteMapper.class, ModItems.sat_mapper, 0.538F, 1.0F, 0.523F);
+		// registerSatellite(SatelliteScanner.class, ModItems.sat_scanner, 0.544F, 0.680F, 1.0F);
+		// registerSatellite(SatelliteRadar.class, ModItems.sat_radar, 0.134F, 1.0F, 0.134F);
+		// registerSatellite(SatelliteLaser.class, ModItems.sat_laser, 0.221F, 0.663F, 1.0F);
+		// registerSatellite(SatelliteResonator.class, ModItems.sat_resonator, 1.0F, 0.646F, 0.181F);
+		// registerSatellite(SatelliteFoeq.class, ModItems.sat_foeq, 1.0F, 0.15F, 0.15F);
+		// registerSatellite(SatelliteMiner.class, ModItems.sat_miner, 0.46F, 0.56F, 0.68F);
+		// registerSatellite(SatelliteLunarMiner.class, ModItems.sat_lunar_miner, 0.42F, 0.54F, 0.82F);
+		// registerSatellite(SatelliteDysonRelay.class, ModItems.sat_dyson_relay, 1.0F, 0.9F, 0.8F);
+		// registerSatellite(SatelliteHorizons.class, ModItems.sat_gerald, 0.0F, 0.0F, 0.0F);
+		// registerSatellite(SatelliteRailgun.class, ModItems.sat_war, 0.0F, 0.0F, 0.0F);
 	}
 
 	/**
@@ -236,7 +236,7 @@ public abstract class Satellite {
 
 	public static int getTargetDimensionId(Class<? extends Satellite> satelliteClass, int fallbackDimensionId) {
 		if(satelliteClass == null) return fallbackDimensionId;
-		if(SatelliteFoeq.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.DUNA.getDimensionId();
+		// if(SatelliteFoeq.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.DUNA.getDimensionId();
 		if(SatelliteLunarMiner.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.MUN.getDimensionId();
 		if(SatelliteMiner.class.isAssignableFrom(satelliteClass)) return SolarSystem.Body.DRES.getDimensionId();
 		return fallbackDimensionId;
@@ -252,34 +252,34 @@ public abstract class Satellite {
 			return;
 		}
 
-		Satellite sat = create(id);
+		// Satellite sat = create(id);
 
-		if(sat != null) {
-			int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
-			if(world.provider.dimensionId != targetDimensionId) {
-				World targetWorld = DimensionManager.getWorld(targetDimensionId);
-				if(targetWorld == null) {
-					DimensionManager.initDimension(targetDimensionId);
-					targetWorld = DimensionManager.getWorld(targetDimensionId);
-				}
-				if(targetWorld != null) world = targetWorld;
-			}
+		// if(sat != null) {
+		// 	int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
+		// 	if(world.provider.dimensionId != targetDimensionId) {
+		// 		World targetWorld = DimensionManager.getWorld(targetDimensionId);
+		// 		if(targetWorld == null) {
+		// 			DimensionManager.initDimension(targetDimensionId);
+		// 			targetWorld = DimensionManager.getWorld(targetDimensionId);
+		// 		}
+		// 		if(targetWorld != null) world = targetWorld;
+		// 	}
 
-			sat.inclination = getInclination(stack);
-			sat.altitude = getAltitude(stack);
-			sat.phaseOffset = getPhaseOffset(stack);
-			sat.isBlinking = isBlinking(stack);
-			sat.blinkPeriod = getBlinkPeriod(stack);
-			sat.owner = getOwner(stack);
-			sat.colorR = getColorR(stack);
-			sat.colorG = getColorG(stack);
-			sat.colorB = getColorB(stack);
+		// 	sat.inclination = getInclination(stack);
+		// 	sat.altitude = getAltitude(stack);
+		// 	sat.phaseOffset = getPhaseOffset(stack);
+		// 	sat.isBlinking = isBlinking(stack);
+		// 	sat.blinkPeriod = getBlinkPeriod(stack);
+		// 	sat.owner = getOwner(stack);
+		// 	sat.colorR = getColorR(stack);
+		// 	sat.colorG = getColorG(stack);
+		// 	sat.colorB = getColorB(stack);
 
-			SatelliteSavedData data = SatelliteSavedData.getData(world, (int) x, (int) z);
-			data.sats.put(freq, sat);
-			sat.onOrbit(world, x, y, z);
-			data.markDirty();
-		}
+		// 	SatelliteSavedData data = SatelliteSavedData.getData(world, (int) x, (int) z);
+		// 	data.sats.put(freq, sat);
+		// 	sat.onOrbit(world, x, y, z);
+		// 	data.markDirty();
+		// }
 	}
 
 	public static Satellite create(int id) {

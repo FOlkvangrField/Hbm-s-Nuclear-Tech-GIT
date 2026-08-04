@@ -167,7 +167,7 @@ public class ItemSatellite extends ItemCustomMissilePart implements ISatChip, IG
 	}
 
 	@Override
-	public void receiveControl(ItemStack stack, NBTTagCompound data) {
+	public void receiveControl(EntityPlayer player, ItemStack stack, NBTTagCompound data) {
 		int r = MathHelper.clamp_int(data.getInteger("satColorR"), 0, 255);
 		int g = MathHelper.clamp_int(data.getInteger("satColorG"), 0, 255);
 		int b = MathHelper.clamp_int(data.getInteger("satColorB"), 0, 255);

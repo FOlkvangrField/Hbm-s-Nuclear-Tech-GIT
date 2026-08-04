@@ -153,7 +153,6 @@ public class TileEntityMachineSatDock extends TileEntity implements ISidedInvent
 
 				if(sat instanceof SatelliteMiner) {
 					SatelliteMiner miner = (SatelliteMiner) sat;
-					int delay = 10 * 60 * 1000;
 
 					if(miner.lastOp + delay < System.currentTimeMillis()) {
 						EntityMinerRocket rocket = new EntityMinerRocket(worldObj);
@@ -166,22 +165,24 @@ public class TileEntityMachineSatDock extends TileEntity implements ISidedInvent
 						miner.lastOp = System.currentTimeMillis();
 						data.markDirty();
 					}
+				}
+			}
 
-					@SuppressWarnings("unchecked")
-					List<EntityMinerRocket> list = worldObj.getEntitiesWithinAABBExcludingEntity(null,
-							AxisAlignedBB.getBoundingBox(xCoord - 0.25 + 0.5, yCoord + 0.75, zCoord - 0.25 + 0.5, xCoord + 0.25 + 0.5, yCoord + 2, zCoord + 0.25 + 0.5),
-							entity -> entity instanceof EntityMinerRocket);
+			@SuppressWarnings("unchecked")
+			List<EntityMinerRocket> list = worldObj.getEntitiesWithinAABBExcludingEntity(null,
+					AxisAlignedBB.getBoundingBox(xCoord - 0.25 + 0.5, yCoord + 0.75, zCoord - 0.25 + 0.5, xCoord + 0.25 + 0.5, yCoord + 2, zCoord + 0.25 + 0.5),
+					entity -> entity instanceof EntityMinerRocket);
 
-					for(EntityMinerRocket rocket : list) {
-						if(freq != rocket.getDataWatcher().getWatchableObjectInt(17)) {
-							rocket.setDead();
-							ExplosionNukeSmall.explode(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, ExplosionNukeSmall.PARAMS_TOTS);
-							break;
-						}
+			for(EntityMinerRocket rocket : list) {
+				if(slots[15] != null && ISatChip.getFreqS(slots[15]) != rocket.getDataWatcher().getWatchableObjectInt(17)) {
+					rocket.setDead();
+					ExplosionNukeSmall.explode(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, ExplosionNukeSmall.PARAMS_TOTS);
+					break;
+				}
 
 				if(rocket.getDataWatcher().getWatchableObjectInt(16) == 1 && rocket.timer == 50) {
 					SatelliteBase sat = data.getSatFromFreq(ISatChip.getFreqS(slots[15]));
-					if(sat != null) unloadCargo((SatelliteMiner) sat);
+					if(sat instanceof SatelliteMiner) unloadCargo((SatelliteMiner) sat);
 				}
 			}
 

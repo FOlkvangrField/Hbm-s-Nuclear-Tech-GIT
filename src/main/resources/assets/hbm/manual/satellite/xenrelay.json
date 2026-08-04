@@ -1,7 +1,7 @@
 {
 	"name": "Xenium Resonator Satellite",
-	"icon": ["hbm:item.satellite", 1, 7],
-	"trigger": [["hbm:item.satellite", 1, 7]],
+	"icon": ["hbm:item.sat_resonator", 1, 0],
+	"trigger": [["hbm:item.sat_resonator", 1, 0]],
 	"title": {
 		"en_US": "Xenium Resonator Satellite"
 	},

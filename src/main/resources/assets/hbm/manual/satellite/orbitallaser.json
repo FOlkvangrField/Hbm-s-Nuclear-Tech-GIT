@@ -1,7 +1,7 @@
 {
 	"name": "Orbital Precision Laser",
-	"icon": ["hbm:item.satellite", 1, 5],
-	"trigger": [["hbm:item.satellite", 1, 5]],
+	"icon": ["hbm:item.sat_precision_laser", 1, 0],
+	"trigger": [["hbm:item.sat_precision_laser", 1, 0]],
 	"title": {
 		"en_US": "Orbital Precision Laser"
 	},

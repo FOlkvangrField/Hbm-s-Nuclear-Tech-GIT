@@ -1,7 +1,7 @@
 {
 	"name": "Orbital Death Ray",
-	"icon": ["hbm:item.satellite", 1, 6],
-	"trigger": [["hbm:item.satellite", 1, 6]],
+	"icon": ["hbm:item.sat_laser", 1, 0],
+	"trigger": [["hbm:item.sat_laser", 1, 0]],
 	"title": {
 		"en_US": "Orbital Death Ray"
 	},

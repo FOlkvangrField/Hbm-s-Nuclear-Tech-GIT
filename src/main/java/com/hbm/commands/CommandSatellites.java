@@ -57,7 +57,7 @@ public class CommandSatellites extends CommandBase {
 			break;
 		case "descend":
 			int freq = parseInt(sender, args[1]);
-			SatelliteSavedData data = SatelliteSavedData.getData(sender.getEntityWorld());
+			SatelliteSavedData data = SatelliteSavedData.getData(sender.getEntityWorld(), sender.getPlayerCoordinates().posX, sender.getPlayerCoordinates().posZ);
 			if(data.sats.containsKey(freq)) {
 				data.sats.remove(freq);
 				data.markDirty();
@@ -67,7 +67,7 @@ public class CommandSatellites extends CommandBase {
 			}
 			break;
 		case "list":
-			data = SatelliteSavedData.getData(sender.getEntityWorld());
+			data = SatelliteSavedData.getData(sender.getEntityWorld(), sender.getPlayerCoordinates().posX, sender.getPlayerCoordinates().posZ);
 			if(data.sats.isEmpty()) {
 				ChatComponentTranslation message = new ChatComponentTranslation("commands.satellite.no_active_satellites");
 				message.getChatStyle().setColor(EnumChatFormatting.RED);

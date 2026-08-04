@@ -23,8 +23,7 @@ import com.hbm.render.shader.Shader;
 import com.hbm.render.util.AtmosphereRenderUtil;
 import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.saveddata.satellites.Satellite;
-import com.hbm.saveddata.satellites.SatelliteFoeq;
-import com.hbm.saveddata.satellites.SatelliteLaser;
+import com.hbm.saveddata.satellites.SatelliteBase;
 import com.hbm.saveddata.satellites.SatelliteMapper;
 import com.hbm.saveddata.satellites.SatelliteMiner;
 import com.hbm.saveddata.satellites.SatelliteRadar;
@@ -55,13 +54,13 @@ public class GUIScreenSatSettings extends GuiScreen {
 	private static final ResourceLocation impactTexture = new ResourceLocation(RefStrings.MODID + ":textures/misc/space/impact.png");
 	private static final ResourceLocation defaultMask = new ResourceLocation(RefStrings.MODID, "textures/misc/space/default_mask.png");
 	private static final ResourceLocation satelliteTextureDefault = new ResourceLocation(RefStrings.MODID, "textures/items/sat_base.png");
-	private static final ResourceLocation satelliteTextureFoeq = new ResourceLocation(RefStrings.MODID, "textures/items/sat_foeq.png");
-	private static final ResourceLocation satelliteTextureLaser = new ResourceLocation(RefStrings.MODID, "textures/items/sat_laser.png");
-	private static final ResourceLocation satelliteTextureMapper = new ResourceLocation(RefStrings.MODID, "textures/items/sat_mapper.png");
-	private static final ResourceLocation satelliteTextureMiner = new ResourceLocation(RefStrings.MODID, "textures/items/sat_miner.png");
-	private static final ResourceLocation satelliteTextureRadar = new ResourceLocation(RefStrings.MODID, "textures/items/sat_radar.png");
-	private static final ResourceLocation satelliteTextureResonator = new ResourceLocation(RefStrings.MODID, "textures/items/sat_resonator.png");
-	private static final ResourceLocation satelliteTextureScanner = new ResourceLocation(RefStrings.MODID, "textures/items/sat_scanner.png");
+	// private static final ResourceLocation satelliteTextureFoeq = new ResourceLocation(RefStrings.MODID, "textures/items/sat_foeq.png");
+	// private static final ResourceLocation satelliteTextureLaser = new ResourceLocation(RefStrings.MODID, "textures/items/sat_laser.png");
+	// private static final ResourceLocation satelliteTextureMapper = new ResourceLocation(RefStrings.MODID, "textures/items/sat_mapper.png");
+	// private static final ResourceLocation satelliteTextureMiner = new ResourceLocation(RefStrings.MODID, "textures/items/sat_miner.png");
+	// private static final ResourceLocation satelliteTextureRadar = new ResourceLocation(RefStrings.MODID, "textures/items/sat_radar.png");
+	// private static final ResourceLocation satelliteTextureResonator = new ResourceLocation(RefStrings.MODID, "textures/items/sat_resonator.png");
+	// private static final ResourceLocation satelliteTextureScanner = new ResourceLocation(RefStrings.MODID, "textures/items/sat_scanner.png");
 	private static final Map<Class<?>, ResourceLocation> satelliteTextureByClass = new HashMap<Class<?>, ResourceLocation>();
 	private static final ResourceLocation[] citylights = new ResourceLocation[]{
 		new ResourceLocation(RefStrings.MODID, "textures/misc/space/citylights_0.png"),
@@ -77,13 +76,13 @@ public class GUIScreenSatSettings extends GuiScreen {
 	private static final Shader nightLightsShader = new Shader(new ResourceLocation(RefStrings.MODID, "shaders/nightlights.frag"));
 
 	static {
-		satelliteTextureByClass.put(SatelliteMapper.class, satelliteTextureMapper);
-		satelliteTextureByClass.put(SatelliteScanner.class, satelliteTextureScanner);
-		satelliteTextureByClass.put(SatelliteRadar.class, satelliteTextureRadar);
-		satelliteTextureByClass.put(SatelliteLaser.class, satelliteTextureLaser);
-		satelliteTextureByClass.put(SatelliteResonator.class, satelliteTextureResonator);
-		satelliteTextureByClass.put(SatelliteFoeq.class, satelliteTextureFoeq);
-		satelliteTextureByClass.put(SatelliteMiner.class, satelliteTextureMiner);
+		// satelliteTextureByClass.put(SatelliteMapper.class, satelliteTextureMapper);
+		// satelliteTextureByClass.put(SatelliteScanner.class, satelliteTextureScanner);
+		// satelliteTextureByClass.put(SatelliteRadar.class, satelliteTextureRadar);
+		// satelliteTextureByClass.put(SatelliteLaser.class, satelliteTextureLaser);
+		// satelliteTextureByClass.put(SatelliteResonator.class, satelliteTextureResonator);
+		// satelliteTextureByClass.put(SatelliteFoeq.class, satelliteTextureFoeq);
+		// satelliteTextureByClass.put(SatelliteMiner.class, satelliteTextureMiner);
 	}
 
 	private final EntityPlayer player;
@@ -520,11 +519,11 @@ public class GUIScreenSatSettings extends GuiScreen {
 		CelestialBody body = getPreviewBody(held);
 		float bodySizeAt1x = getBodySizePxAt1x(body);
 		float baseOrbitRadiusMapPx = bodySizeAt1x * 1.5F;
-		Map<Integer, Satellite> satellites = SatelliteSavedData.getClientSats(body.dimensionId);
+		Map<Integer, SatelliteBase> satellites = SatelliteSavedData.getClientSats(body.dimensionId);
 		String owner = editOwner;
 		float maxAltitude = editAltitude;
 
-		for(Satellite satellite : satellites.values()) {
+		for(SatelliteBase satellite : satellites.values()) {
 			if(owner.equals(satellite.owner)) {
 				maxAltitude = Math.max(maxAltitude, satellite.altitude);
 			}
@@ -595,16 +594,16 @@ public class GUIScreenSatSettings extends GuiScreen {
 		);
 	}
 
-	private void drawOwnedSatellites(Map<Integer, Satellite> satellites, String owner, float centerX, float centerY, float baseOrbitRadiusMapPx, float zoom, double angle, float iconSize, boolean frontHalf) {
-		for(Satellite satellite : satellites.values()) {
+	private void drawOwnedSatellites(Map<Integer, SatelliteBase> satellites, String owner, float centerX, float centerY, float baseOrbitRadiusMapPx, float zoom, double angle, float iconSize, boolean frontHalf) {
+		for(SatelliteBase satellite : satellites.values()) {
 			if(!owner.equals(satellite.owner)) continue;
 			float blinkAlpha = getBlinkAlpha(satellite.isBlinking, satellite.blinkPeriod);
 
 			drawSatelliteOrbitHalf(centerX, centerY, baseOrbitRadiusMapPx, zoom, satellite.altitude, satellite.inclination, satellite.colorR, satellite.colorG, satellite.colorB, frontHalf, 0.25F * blinkAlpha);
 		}
 
-		for(Map.Entry<Integer, Satellite> entry : satellites.entrySet()) {
-			Satellite satellite = entry.getValue();
+		for(Map.Entry<Integer, SatelliteBase> entry : satellites.entrySet()) {
+			SatelliteBase satellite = entry.getValue();
 			if(!owner.equals(satellite.owner)) continue;
 
 			drawSatelliteIcon(getSatelliteTextureByType(satellite.getClass()), centerX, centerY, baseOrbitRadiusMapPx, zoom, satellite.phaseOffset, satellite.altitude, satellite.inclination, angle, frontHalf, iconSize);

@@ -1,7 +1,7 @@
 {
 	"name": "Spy Satellite",
-	"icon": ["hbm:item.satellite", 1, 0],
-	"trigger": [["hbm:item.satellite", 1, 0]],
+	"icon": ["hbm:item.sat_mapper", 1, 0],
+	"trigger": [["hbm:item.sat_mapper", 1, 0]],
 	"title": {
 		"en_US": "Spy Satellite"
 	},

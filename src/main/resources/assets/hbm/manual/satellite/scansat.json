@@ -1,7 +1,7 @@
 {
 	"name": "Depth Scanning Satellite",
-	"icon": ["hbm:item.satellite", 1, 1],
-	"trigger": [["hbm:item.satellite", 1, 1]],
+	"icon": ["hbm:item.sat_scanner", 1, 0],
+	"trigger": [["hbm:item.sat_scanner", 1, 0]],
 	"title": {
 		"en_US": "Depth Scanning Satellite"
 	},

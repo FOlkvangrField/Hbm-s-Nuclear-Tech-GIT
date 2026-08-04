@@ -2,7 +2,6 @@ package com.hbm.saveddata.satellites;
 
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.items.ModItems;
-import com.hbm.items.special.ItemSatellite.EnumSatType;
 import com.hbm.saveddata.SatelliteSavedData;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,30 +14,26 @@ import java.util.List;
 public class XSatelliteRegistry {
 	
 	public static final List<Class<? extends SatelliteBase>> satellites = new ArrayList<>();
-	public static final HashMap<ComparableStack, Class<? extends SatelliteBase>> itemToClass = new HashMap<>();
+	public static final HashMap<Item, Class<? extends SatelliteBase>> itemToClass = new HashMap<>();
+	private static final HashMap<Class<? extends SatelliteBase>, float[]> satelliteColors = new HashMap<>();
 	
 	public static void register() {
 
-		registerSatellite(SatelliteMapper.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.SPY));
-		registerSatellite(SatelliteScanner.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.SCANNER));
-		registerSatellite(SatelliteRadar.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.RADAR));
-		registerSatellite(SatelliteDeathRay.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.DEATH_RAY));
-		registerSatellite(SatelliteResonator.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.XENIUM_RESONATOR));
-		registerSatellite(SatelliteRelay.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.XENIUM_RESONATOR));
-		registerSatellite(SatelliteMiner.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.MINER_ASTRO));
-		registerSatellite(SatelliteLunarMiner.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.MINER_LUNAR));
-		registerSatellite(SatelliteHorizons.class, ModItems.sat_gerald);
-		registerSatellite(SatellitePrecisionLaser.class, new ComparableStack(ModItems.satellite, 1, EnumSatType.PRECISION_LASER));
-		
+		// no enum items, sorry
 
-		registerSatellite(SatelliteMapper.class, ModItems.sat_mapper);
-		registerSatellite(SatelliteScanner.class, ModItems.sat_scanner);
-		registerSatellite(SatelliteRadar.class, ModItems.sat_radar);
-		registerSatellite(SatelliteDeathRay.class, ModItems.sat_laser);
-		registerSatellite(SatelliteResonator.class, ModItems.sat_resonator);
-		registerSatellite(SatelliteRelay.class, ModItems.sat_foeq);
-		registerSatellite(SatelliteMiner.class, ModItems.sat_miner);
-		registerSatellite(SatelliteLunarMiner.class, ModItems.sat_lunar_miner);
+		registerSatellite(SatelliteMapper.class, ModItems.sat_mapper, 0.538F, 1.0F, 0.523F);
+		registerSatellite(SatelliteScanner.class, ModItems.sat_scanner, 0.544F, 0.680F, 1.0F);
+		registerSatellite(SatelliteRadar.class, ModItems.sat_radar, 0.134F, 1.0F, 0.134F);
+		registerSatellite(SatelliteDeathRay.class, ModItems.sat_laser, 0.221F, 0.663F, 1.0F);
+		registerSatellite(SatelliteResonator.class, ModItems.sat_resonator, 1.0F, 0.646F, 0.181F);
+		registerSatellite(SatelliteRelay.class, ModItems.sat_foeq, 1.0F, 0.15F, 0.15F);
+		registerSatellite(SatelliteMiner.class, ModItems.sat_miner, 0.46F, 0.56F, 0.68F);
+		registerSatellite(SatelliteLunarMiner.class, ModItems.sat_lunar_miner, 0.42F, 0.54F, 0.82F);
+		registerSatellite(SatelliteDysonRelay.class, ModItems.sat_dyson_relay, 1.0F, 0.9F, 0.8F);
+		registerSatellite(SatelliteHorizons.class, ModItems.sat_gerald, 0.0F, 0.0F, 0.0F);
+		registerSatellite(SatelliteRailgun.class, ModItems.sat_war, 0.0F, 0.0F, 0.0F);
+		registerSatellite(SatellitePrecisionLaser.class, ModItems.sat_precision_laser, 0.221F, 1.0F, 0.663F);
+
 	}
 
 	/**
@@ -46,18 +41,11 @@ public class XSatelliteRegistry {
 	 * @param sat - Satellite class
 	 * @param item - Satellite item (which will be placed in a rocket)
 	 */
-	@Deprecated
-	public static void registerSatellite(Class<? extends SatelliteBase> sat, Item item) {
-		if(!itemToClass.containsKey(item) && !itemToClass.containsValue(sat)) {
-			satellites.add(sat);
-			itemToClass.put(new ComparableStack(item), sat);
-		}
-	}
-
-	public static void registerSatellite(Class<? extends SatelliteBase> sat, ComparableStack item) {
+	public static void registerSatellite(Class<? extends SatelliteBase> sat, Item item, float r, float g, float b) {
 		if(!itemToClass.containsKey(item) && !itemToClass.containsValue(sat)) {
 			satellites.add(sat);
 			itemToClass.put(item, sat);
+			satelliteColors.put(sat, new float[] { r, g, b });
 		}
 	}
 	
@@ -67,7 +55,7 @@ public class XSatelliteRegistry {
 		SatelliteBase sat = createFromItem(stack);
 		
 		if(sat != null) {
-			SatelliteSavedData data = SatelliteSavedData.getData(world);
+			SatelliteSavedData data = SatelliteSavedData.getData(world, (int)x, (int)z);
 			data.sats.put(freq, sat);
 			sat.onOrbit(world, x, y, z);
 			data.markDirty();
@@ -87,4 +75,22 @@ public class XSatelliteRegistry {
 		} catch(Exception e) { }
 		return null;
 	}
+	
+
+	public static float[] getRegisteredColor(Item item) {
+		Class<? extends SatelliteBase> satelliteClass = itemToClass.get(item);
+		if(satelliteClass == null) {
+			throw new IllegalStateException("No satellite class registered for item: " + item);
+		}
+		return getRegisteredColor(satelliteClass);
+	}
+
+	public static float[] getRegisteredColor(Class<? extends SatelliteBase> satelliteClass) {
+		float[] color = satelliteColors.get(satelliteClass);
+		if(color == null) {
+			throw new IllegalStateException("No color registered for satellite class: " + satelliteClass);
+		}
+		return color;
+	}
+
 }
