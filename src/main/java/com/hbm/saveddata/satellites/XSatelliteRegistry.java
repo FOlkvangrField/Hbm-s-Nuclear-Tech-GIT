@@ -83,7 +83,6 @@ public class XSatelliteRegistry {
 			
 			if(sat != null) {
 				int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
-				System.out.println("sending to: " + targetDimensionId + ", from: " + world.provider.dimensionId);
 				if(world.provider.dimensionId != targetDimensionId) {
 					World targetWorld = DimensionManager.getWorld(targetDimensionId);
 					if(targetWorld == null) {
