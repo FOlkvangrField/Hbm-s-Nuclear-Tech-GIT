@@ -83,6 +83,7 @@ public class XSatelliteRegistry {
 			
 			if(sat != null) {
 				int targetDimensionId = getTargetDimensionId(sat.getClass(), world.provider.dimensionId);
+				System.out.println("sending to: " + targetDimensionId + ", from: " + world.provider.dimensionId);
 				if(world.provider.dimensionId != targetDimensionId) {
 					World targetWorld = DimensionManager.getWorld(targetDimensionId);
 					if(targetWorld == null) {
@@ -102,6 +103,7 @@ public class XSatelliteRegistry {
 				sat.colorG = SatelliteBase.getColorG(stack);
 				sat.colorB = SatelliteBase.getColorB(stack);
 
+				data = SatelliteSavedData.getData(world, (int)x, (int)z);
 				data.sats.put(freq, sat);
 				sat.onOrbit(world, x, y, z);
 				data.markDirty();
